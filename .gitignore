@@ -363,6 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # MY_EXCEPT
-.sln
-.vcxproj
-.filters
+*.sln
+*.vcxproj
+*.filters
