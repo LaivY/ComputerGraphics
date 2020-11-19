@@ -1,10 +1,11 @@
-#include "openGL.h"
-#include "Shader.h"
-#include "Camera.h"
+#include "FRAMEWORK/openGL.h"
+#include "FRAMEWORK/Shader.h"
+#include "FRAMEWORK/Camera.h"
+#include "INGAME/Chracter.h"
 #include "Main.h"
 
 // GLOBAL
-Shader s; Camera c; Light l;
+Shader s; Camera c; Character chr;
 
 void main(int argc, char** argv)
 {
@@ -34,8 +35,8 @@ GLvoid drawScene()
 	/* 그리기 시작 */
 	glEnable(GL_DEPTH_TEST);
 
-	drawAxis();
-	drawCube();
+	drawLand();
+	chr.drawCharacter(s, c);
 
 	glDisable(GL_DEPTH_TEST);
 	/* 그리기 종료 */
@@ -48,119 +49,143 @@ GLvoid reShape(int w, int h)
 	glViewport(0, 0, w, h);
 }
 
+// DRAW
+void drawLand()
+{
+	float CUBE_DATA[] =
+	{
+		// 상
+		-1.0,  1.0, -1.0,
+		1.0,  1.0, -1.0,
+		1.0,  1.0,  1.0,
+		1.0,  1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		-1.0,  1.0, -1.0,
+
+		// 하
+		-1.0, -1.0, -1.0,
+		1.0, -1.0, -1.0,
+		1.0, -1.0,  1.0,
+		1.0, -1.0,  1.0,
+		-1.0, -1.0,  1.0,
+		-1.0, -1.0, -1.0,
+
+		// 앞
+		-1.0, -1.0,  1.0,
+		1.0, -1.0,  1.0,
+		1.0,  1.0,  1.0,
+		1.0,  1.0,  1.0,
+		-1.0,  1.0,  1.0,
+		-1.0, -1.0,  1.0,
+
+		// 뒤
+		-1.0, -1.0, -1.0,
+		1.0, -1.0, -1.0,
+		1.0,  1.0, -1.0,
+		1.0,  1.0, -1.0,
+		-1.0,  1.0, -1.0,
+		-1.0, -1.0, -1.0,
+
+		// 좌
+		-1.0,  1.0,  1.0,
+		-1.0,  1.0, -1.0,
+		-1.0, -1.0, -1.0,
+		-1.0, -1.0, -1.0,
+		-1.0, -1.0,  1.0,
+		-1.0,  1.0,  1.0,
+
+		// 우
+		1.0,  1.0,  1.0,
+		1.0,  1.0, -1.0,
+		1.0, -1.0, -1.0,
+		1.0, -1.0, -1.0,
+		1.0, -1.0,  1.0,
+		1.0,  1.0,  1.0
+	};
+
+	float color[] =
+	{
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+		0.2, 0.2, 0.2,
+	};
+
+	std::vector<glm::vec3> pos, rgb;
+	for (int i = 0; i < sizeof(CUBE_DATA) / sizeof(CUBE_DATA[0]); i += 3)
+	{
+		glm::vec3 p = { CUBE_DATA[i], CUBE_DATA[i + 1], CUBE_DATA[i + 2] };
+		pos.push_back(p);
+	}
+	for (int i = 0; i < sizeof(color) / sizeof(color[0]); i += 3)
+	{
+		glm::vec3 c = { color[i], color[i + 1], color[i + 2] };
+		rgb.push_back(c);
+	}
+
+	glUseProgram(s.pid);
+
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 1));
+	GLuint model_matrix_location = glGetUniformLocation(s.pid, "model");
+	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(scale));
+	s.setBufferData(pos, rgb); glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	s.setBufferData(pos, rgb);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glUseProgram(0);
+}
+
 // CALLBACK
 void keyboard(unsigned char key, int x, int y)
 {
-	camera_keyboard_event(c, key, x, y);
-	camera_set_view_matrix(c, s.pid);
+	chr_keyboard_event(chr, c, key, x, y);
+	chr_set_camera_view_matrix(chr, c, s.pid);
 	glutPostRedisplay();
 }
 
 void motion(int x, int y)
 {
-	camera_mouse_motion_event(c, x, y);
-	camera_set_view_matrix(c, s.pid);
+	chr_camera_mouse_motion_event(chr, c, x, y);
+	chr_set_camera_view_matrix(chr, c, s.pid);
 	glutPostRedisplay();
-}
-
-// DRAW
-void drawAxis()
-{
-	std::vector<glm::vec3> pos, color;
-	glm::vec3 xs = { -3.0,  0.0,  0.0 };
-	glm::vec3 xe = {  3.0,  0.0,  0.0 };
-	glm::vec3 ys = {  0.0, -3.0,  0.0 };
-	glm::vec3 ye = {  0.0,  3.0,  0.0 };
-	glm::vec3 zs = {  0.0,  0.0, -3.0 };
-	glm::vec3 ze = {  0.0,  0.0,  3.0 };
-
-	pos.push_back(xs);
-	pos.push_back(xe);
-	pos.push_back(ys);
-	pos.push_back(ye);
-	pos.push_back(zs);
-	pos.push_back(ze);
-
-	glm::vec3 c = { 1.0, 1.0, 1.0 };
-	color.push_back(c);
-	color.push_back(c);
-	color.push_back(c);
-	color.push_back(c);
-	color.push_back(c);
-	color.push_back(c);
-
-	glUseProgram(s.pid);
-	s.setBufferData(pos, color);
-	glDrawArrays(GL_LINES, 0, 6);
-	glUseProgram(0);
-}
-
-void drawCube()
-{
-	float data[] =
-	{
-		 // 상
-		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,
-
-		 // 하
-		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,	0.0f, 1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,	0.0f, 1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,	0.0f, 1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f,	0.0f, 1.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,  0.0f,
-
-		 // 앞
-		-0.5f, -0.5f,  0.5f,	0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f,	0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,	0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,	0.0f,  0.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f,	0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f,	0.0f,  0.0f,  1.0f,
-
-		 // 뒤
-		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,	0.0f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,	0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, 1.0f,
-
-		 // 좌
-		-0.5f,  0.5f,  0.5f,	1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f,	1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,	1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,	1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f,	1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f,	1.0f,  0.0f,  0.0f,
-
-		 // 우
-		 0.5f,  0.5f,  0.5f,	1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,	1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,	1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,	1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,	1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,	1.0f,  0.0f,  0.0f,
-	};
-	
-	std::vector<glm::vec3> pos, rgb;
-	for (int i = 0; i < sizeof(data) / sizeof(data[0]); i += 6)
-	{
-		glm::vec3 p = { data[i], data[i + 1], data[i + 2] };
-		glm::vec3 c = { data[i + 3], data[i + 4], data[i + 5] };
-		
-		pos.push_back(p); rgb.push_back(c);
-	}
-
-	glUseProgram(s.pid);
-	s.setBufferData(pos, rgb);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glUseProgram(0);
 }
 
 // ini
@@ -171,7 +196,7 @@ void iniUniformData(GLuint pid)
 	glm::mat4 base(1.0f);
 	GLuint model_matrix_location = glGetUniformLocation(pid, "model");
 	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(base));
-	
+
 	glm::vec3 eye = { c.x, c.y, c.z };
 	glm::vec3 at = { sin(glm::radians(c.xzAngle)), sin(glm::radians(c.yAngle)), -cos(glm::radians(c.xzAngle)) };
 	glm::vec3 up = { 0, cos(glm::radians(c.yAngle)), 0 };

@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\Shader">
+      <UniqueIdentifier>{c52d38d9-89b0-4474-a820-dd2cff47ba0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\FRAMEWORK">
+      <UniqueIdentifier>{e986778e-785e-4cc6-9fcf-cf76f15435a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\INGAME">
+      <UniqueIdentifier>{75e6835c-9cc7-4412-9850-83dbea860f77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\FRAMEWORK">
+      <UniqueIdentifier>{af876211-accb-4c60-ba7d-b0290eab4f00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\INGAME">
+      <UniqueIdentifier>{b34bf74b-1f7a-4b3d-9efd-2670636069a8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FRAMEWORK\Shader.cpp">
+      <Filter>소스 파일\FRAMEWORK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\INGAME\Chracter.cpp">
+      <Filter>소스 파일\INGAME</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\shader\fragment.glsl">
+      <Filter>소스 파일\Shader</Filter>
+    </None>
+    <None Include="..\shader\vertex.glsl">
+      <Filter>소스 파일\Shader</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Main.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FRAMEWORK\Camera.h">
+      <Filter>헤더 파일\FRAMEWORK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FRAMEWORK\Shader.h">
+      <Filter>헤더 파일\FRAMEWORK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\INGAME\Chracter.h">
+      <Filter>헤더 파일\INGAME</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FRAMEWORK\openGL.h">
+      <Filter>헤더 파일\FRAMEWORK</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

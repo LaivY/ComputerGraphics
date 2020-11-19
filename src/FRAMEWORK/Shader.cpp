@@ -152,51 +152,6 @@ void Shader::setBufferDataWithEBO(std::vector<glm::vec3>& pos, std::vector<glm::
 	glEnableVertexAttribArray(cAttribute);
 }
 
-void Shader::setBufferDataWithLight(std::vector<glm::vec3>& pos, std::vector<glm::vec3>& norm, glm::vec3& oRGB, Camera& c, Light& l)
-{
-	if (VAO == -1)
-		glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	if (pVBO == -1)
-		glGenBuffers(1, &pVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, pVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * pos.size(), &pos[0], GL_STATIC_DRAW);
-
-	if (NBO == -1)
-		glGenBuffers(1, &NBO);
-	glBindBuffer(GL_ARRAY_BUFFER, NBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * norm.size(), &norm[0], GL_STATIC_DRAW);
-
-	// pos
-	GLint pAttribute = glGetAttribLocation(pid, "vPos");
-	glBindBuffer(GL_ARRAY_BUFFER, pVBO);
-	glVertexAttribPointer(pAttribute, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(pAttribute);
-
-	// normal
-	GLint nAttribute = glGetAttribLocation(pid, "vNormal");
-	glBindBuffer(GL_ARRAY_BUFFER, NBO);
-	glVertexAttribPointer(nAttribute, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(nAttribute);
-
-	// 카메라 위치
-	GLuint viewPosLocation = glGetUniformLocation(pid, "viewPos");
-	glUniform3f(viewPosLocation, c.x, c.y, c.z);
-
-	// 조명 위치
-	GLuint lightPosLocation = glGetUniformLocation(pid, "lightPos");
-	glUniform3f(lightPosLocation, l.x, l.y, l.z);
-
-	// 조명 색
-	GLuint lightColorLocation = glGetUniformLocation(pid, "lightColor");
-	glUniform3f(lightColorLocation, l.r, l.g, l.b);
-
-	// 오브젝트 색
-	GLuint objColorLocation = glGetUniformLocation(pid, "objectColor");
-	glUniform3f(objColorLocation, oRGB.x, oRGB.y, oRGB.z);
-}
-
 void Shader::setBufferDataWithTexture(std::vector<glm::vec3>& pos, std::vector<glm::vec3>& norm, std::vector<glm::vec2>& uv)
 {
 	// 생성
@@ -219,7 +174,7 @@ void Shader::setBufferDataWithTexture(std::vector<glm::vec3>& pos, std::vector<g
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * norm.size(), &norm[0], GL_STATIC_DRAW);
 
 	// 텍스쳐
-	if(TBO == -1)
+	if (TBO == -1)
 		glGenBuffers(1, &TBO);
 	glBindBuffer(GL_ARRAY_BUFFER, TBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * uv.size(), &uv[0], GL_STATIC_DRAW);
