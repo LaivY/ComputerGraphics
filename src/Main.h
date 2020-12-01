@@ -10,6 +10,7 @@ void drawLand();
 // CALLBACK FUNC
 void motion(int x, int y);
 void keyboard(unsigned char key, int x, int y);
+void keyboardUp(unsigned char key, int x, int y);
 
 // INI FUNC
 void iniUniformData(GLuint pid);

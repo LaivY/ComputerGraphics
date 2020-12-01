@@ -2,11 +2,14 @@
 #include "FRAMEWORK/Shader.h"
 #include "FRAMEWORK/Camera.h"
 #include "INGAME/Chracter.h"
+#include "INGAME/Obstacle.h"
 #include "Main.h"
 
 // GLOBAL
-Shader s; Camera c; Character chr;
+Shader s; Camera c;
+Character chr; std::vector<Cube> cube;
 
+void debug();
 void main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
@@ -18,8 +21,10 @@ void main(int argc, char** argv)
 
 	s.loadShaders("../shader/vertex.glsl", "../shader/fragment.glsl");
 	iniUniformData(s.pid);
+	debug();
 
 	glutKeyboardFunc(keyboard);
+	glutKeyboardUpFunc(keyboardUp);
 	glutMotionFunc(motion);
 
 	glutDisplayFunc(drawScene);
@@ -36,7 +41,11 @@ GLvoid drawScene()
 	glEnable(GL_DEPTH_TEST);
 
 	drawLand();
-	chr.drawCharacter(s, c);
+	chr.draw(s, c);
+	for (auto& i : cube)
+	{
+		i.draw(s);
+	}
 
 	glDisable(GL_DEPTH_TEST);
 	/* 그리기 종료 */
@@ -52,7 +61,7 @@ GLvoid reShape(int w, int h)
 // DRAW
 void drawLand()
 {
-	float CUBE_DATA[] =
+	float cube[] =
 	{
 		// 상
 		-1.0,  1.0, -1.0,
@@ -149,9 +158,9 @@ void drawLand()
 	};
 
 	std::vector<glm::vec3> pos, rgb;
-	for (int i = 0; i < sizeof(CUBE_DATA) / sizeof(CUBE_DATA[0]); i += 3)
+	for (int i = 0; i < sizeof(cube) / sizeof(cube[0]); i += 3)
 	{
-		glm::vec3 p = { CUBE_DATA[i], CUBE_DATA[i + 1], CUBE_DATA[i + 2] };
+		glm::vec3 p = { cube[i], cube[i + 1], cube[i + 2] };
 		pos.push_back(p);
 	}
 	for (int i = 0; i < sizeof(color) / sizeof(color[0]); i += 3)
@@ -162,7 +171,7 @@ void drawLand()
 
 	glUseProgram(s.pid);
 
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 1));
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 10));
 	GLuint model_matrix_location = glGetUniformLocation(s.pid, "model");
 	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(scale));
 	s.setBufferData(pos, rgb); glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -176,15 +185,28 @@ void drawLand()
 // CALLBACK
 void keyboard(unsigned char key, int x, int y)
 {
-	chr_keyboard_event(chr, c, key, x, y);
-	chr_set_camera_view_matrix(chr, c, s.pid);
+	if (chr.isCollided(cube))
+		return;
+	chrKeyboardEvent(chr, c, key, x, y);
+	chrSetCameraViewMatrix(chr, c, s.pid);
+	glutPostRedisplay();
+}
+
+void keyboardUp(unsigned char key, int x, int y)
+{
+	if (key == 'w' || key == 'a' || key == 's' || key == 'd')
+	{
+		chr.angle = 90;
+		chr.aAngle = 60 * cos(glm::radians(chr.angle));
+		chr.lAngle = 60 * cos(glm::radians(chr.angle));
+	}
 	glutPostRedisplay();
 }
 
 void motion(int x, int y)
 {
-	chr_camera_mouse_motion_event(chr, c, x, y);
-	chr_set_camera_view_matrix(chr, c, s.pid);
+	chrCameraMouseMotionEvent(chr, c, x, y);
+	chrSetCameraViewMatrix(chr, c, s.pid);
 	glutPostRedisplay();
 }
 
@@ -193,20 +215,35 @@ void iniUniformData(GLuint pid)
 {
 	glUseProgram(pid);
 
+	// 모델, 투영 변환 초기화
 	glm::mat4 base(1.0f);
 	GLuint model_matrix_location = glGetUniformLocation(pid, "model");
 	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(base));
 
-	glm::vec3 eye = { c.x, c.y, c.z };
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 50.0f);
+	GLuint proj_matrix_location = glGetUniformLocation(pid, "proj");
+	glUniformMatrix4fv(proj_matrix_location, 1, GL_FALSE, glm::value_ptr(proj));
+
+	// 뷰 변환 초기화
+	glm::vec4 pos(0.5 * sin(glm::radians(-c.xzAngle)), 0.16, 0.5 * cos(glm::radians(-c.xzAngle)), 1);
+	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), glm::vec3(chr.x, chr.y, chr.z));
+	pos = t0 * pos;
+
+	glm::vec3 eye = { pos.x, pos.y, pos.z };
 	glm::vec3 at = { sin(glm::radians(c.xzAngle)), sin(glm::radians(c.yAngle)), -cos(glm::radians(c.xzAngle)) };
 	glm::vec3 up = { 0, cos(glm::radians(c.yAngle)), 0 };
 	glm::mat4 view = glm::lookAt(eye, eye + at, up);
 	GLuint view_matrix_location = glGetUniformLocation(pid, "view");
 	glUniformMatrix4fv(view_matrix_location, 1, GL_FALSE, glm::value_ptr(view));
 
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 50.0f);
-	GLuint proj_matrix_location = glGetUniformLocation(pid, "proj");
-	glUniformMatrix4fv(proj_matrix_location, 1, GL_FALSE, glm::value_ptr(proj));
-
 	glUseProgram(0);
+}
+
+// debug
+void debug()
+{
+	Cube c(glm::vec3(0, -0.1, -0.5), 0.2);
+	//Cube c2(glm::vec3(0, 1, -0.5), 0.2);
+	cube.push_back(c);
+	//cube.push_back(c2);
 }

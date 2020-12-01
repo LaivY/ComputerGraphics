@@ -39,6 +39,9 @@
     <ClCompile Include="..\src\INGAME\Chracter.cpp">
       <Filter>소스 파일\INGAME</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\INGAME\Obstacle.cpp">
+      <Filter>소스 파일\INGAME</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shader\fragment.glsl">
@@ -63,6 +66,9 @@
     </ClInclude>
     <ClInclude Include="..\src\FRAMEWORK\openGL.h">
       <Filter>헤더 파일\FRAMEWORK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\INGAME\Obstacle.h">
+      <Filter>헤더 파일\INGAME</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
