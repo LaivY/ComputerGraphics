@@ -7,7 +7,7 @@
 
 // GLOBAL
 Shader s; Camera c;
-Character chr; std::vector<Cube> cube;
+Character chr; std::vector<Obstacles> obs;
 
 void debug();
 void main(int argc, char** argv)
@@ -42,9 +42,11 @@ GLvoid drawScene()
 
 	drawLand();
 	chr.draw(s, c);
-	for (auto& i : cube)
+	for (auto& i : obs)
 	{
-		i.draw(s);
+		if (i.cube != nullptr)
+			i.cube->draw(s);
+		//i.draw(s);
 	}
 
 	glDisable(GL_DEPTH_TEST);
@@ -176,37 +178,29 @@ void drawLand()
 	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(scale));
 	s.setBufferData(pos, rgb); glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	s.setBufferData(pos, rgb);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-
 	glUseProgram(0);
 }
 
 // CALLBACK
 void keyboard(unsigned char key, int x, int y)
 {
-	if (chr.isCollided(cube))
-		return;
-	chrKeyboardEvent(chr, c, key, x, y);
-	chrSetCameraViewMatrix(chr, c, s.pid);
+	chr.keyBoardEvent(c, obs, key, x, y);
+	chr.setCameraViewMatrix(c, s.pid);
+	chr.update();
+
 	glutPostRedisplay();
 }
 
 void keyboardUp(unsigned char key, int x, int y)
 {
-	if (key == 'w' || key == 'a' || key == 's' || key == 'd')
-	{
-		chr.angle = 90;
-		chr.aAngle = 60 * cos(glm::radians(chr.angle));
-		chr.lAngle = 60 * cos(glm::radians(chr.angle));
-	}
+	chr.keyBoardUpEvent(key, x, y);
 	glutPostRedisplay();
 }
 
 void motion(int x, int y)
 {
-	chrCameraMouseMotionEvent(chr, c, x, y);
-	chrSetCameraViewMatrix(chr, c, s.pid);
+	chr.mouseMotionEvent(c, x, y);
+	chr.setCameraViewMatrix(c, s.pid);
 	glutPostRedisplay();
 }
 
@@ -226,7 +220,7 @@ void iniUniformData(GLuint pid)
 
 	// 뷰 변환 초기화
 	glm::vec4 pos(0.5 * sin(glm::radians(-c.xzAngle)), 0.16, 0.5 * cos(glm::radians(-c.xzAngle)), 1);
-	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), glm::vec3(chr.x, chr.y, chr.z));
+	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), chr.getPos());
 	pos = t0 * pos;
 
 	glm::vec3 eye = { pos.x, pos.y, pos.z };
@@ -239,11 +233,11 @@ void iniUniformData(GLuint pid)
 	glUseProgram(0);
 }
 
-// debug
 void debug()
 {
-	Cube c(glm::vec3(0, -0.1, -0.5), 0.2);
-	//Cube c2(glm::vec3(0, 1, -0.5), 0.2);
-	cube.push_back(c);
-	//cube.push_back(c2);
+	Obstacles temp;
+	Cube* cube = new Cube(glm::vec3(0, 0.1, -1), 0.2);
+	temp.cube = cube;
+
+	obs.push_back(temp);
 }

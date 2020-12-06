@@ -7,9 +7,6 @@ class Cube
 public:
 	// 왼쪽위, 오른쪽위, 왼쪽아래, 오른쪽아래 순서
 	glm::vec3 top[4], bot[4];
-
-	void draw(Shader& s);
-
 	Cube(glm::vec3 p, float r)
 	{
 		top[0] = { p.x - r, p.y + r, p.z - r };
@@ -22,4 +19,13 @@ public:
 		bot[2] = { p.x - r, p.y - r, p.z + r };
 		bot[3] = { p.x + r, p.y - r, p.z + r };
 	}
+
+	void draw(Shader& s);
+};
+
+// 모든 장애물은 이 class에서 관리됨
+class Obstacles
+{
+public:
+	Cube* cube = nullptr;
 };
