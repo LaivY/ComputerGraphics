@@ -448,6 +448,24 @@ void Character::setCameraViewMatrix(Camera& c, GLuint pid)
 	glUseProgram(0);
 }
 
+void Character::setTopCameraViewMatrix(Camera& _c, GLuint pid)
+{
+	// 카메라 위치
+	glm::vec4 _eye(0, 0, 0, 1);
+	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), pos);
+	glm::mat4 t1 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 1, 0));
+	_eye = t1 * t0 * _eye;
+
+	glUseProgram(pid);
+	glm::vec3 eye = { _eye.x, _eye.y, _eye.z };
+	glm::vec3 at = { 0, -1, 0 };
+	glm::vec3 up = { 0, 0, -1 };
+	glm::mat4 view = glm::lookAt(eye, eye + at, up);
+	GLuint view_matrix_location = glGetUniformLocation(pid, "view");
+	glUniformMatrix4fv(view_matrix_location, 1, GL_FALSE, glm::value_ptr(view));
+	glUseProgram(0);
+}
+
 BOOL Character::isCollided(std::vector<Obstacles>& obs)
 {
 	for (auto& o : obs)

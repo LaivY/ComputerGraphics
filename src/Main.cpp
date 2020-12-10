@@ -6,7 +6,7 @@
 #include "Main.h"
 
 // GLOBAL
-Shader s; Camera c;
+Shader s; Camera c, _c;
 Character chr; std::vector<Obstacles> obs;
 
 void debug();
@@ -36,22 +36,33 @@ GLvoid drawScene()
 {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	/* 그리기 시작 */
 	glEnable(GL_DEPTH_TEST);
 
-	drawLand();
+	// 메인 화면
+	glViewport(0, 0, 800, 600);
+	chr.setCameraViewMatrix(c, s.pid);
+
+	drawLand(s.pid);
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
 		if (i.cube != nullptr)
 			i.cube->draw(s);
-		//i.draw(s);
+	}
+
+	// 미니맵
+	glViewport(560, 420, 240, 180);
+	chr.setTopCameraViewMatrix(_c, s.pid);
+
+	drawLand(s.pid);
+	chr.draw(s, _c);
+	for (auto& i : obs)
+	{
+		if (i.cube != nullptr)
+			i.cube->draw(s);
 	}
 
 	glDisable(GL_DEPTH_TEST);
-	/* 그리기 종료 */
-
 	glutSwapBuffers();
 }
 
@@ -61,7 +72,7 @@ GLvoid reShape(int w, int h)
 }
 
 // DRAW
-void drawLand()
+void drawLand(GLuint pid)
 {
 	float cube[] =
 	{
@@ -171,10 +182,10 @@ void drawLand()
 		rgb.push_back(c);
 	}
 
-	glUseProgram(s.pid);
+	glUseProgram(pid);
 
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 10));
-	GLuint model_matrix_location = glGetUniformLocation(s.pid, "model");
+	GLuint model_matrix_location = glGetUniformLocation(pid, "model");
 	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(scale));
 	s.setBufferData(pos, rgb); glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -185,7 +196,7 @@ void drawLand()
 void keyboard(unsigned char key, int x, int y)
 {
 	chr.keyBoardEvent(c, obs, key, x, y);
-	chr.setCameraViewMatrix(c, s.pid);
+	//chr.setCameraViewMatrix(c, s.pid);
 	chr.update();
 
 	glutPostRedisplay();

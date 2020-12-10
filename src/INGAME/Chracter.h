@@ -25,6 +25,7 @@ public:
 	void keyBoardUpEvent(unsigned char key, int kx, int ky);
 	void mouseMotionEvent(Camera& c, int kx, int ky);
 	void setCameraViewMatrix(Camera& c, GLuint pid);
+	void setTopCameraViewMatrix(Camera& _c, GLuint pid);
 	BOOL isCollided(std::vector<Obstacles>& cube);
 
 	glm::vec3 getPos() { return pos; }

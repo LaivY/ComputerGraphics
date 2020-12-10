@@ -5,7 +5,7 @@
 GLvoid drawScene();
 GLvoid reShape(int w, int h);
 
-void drawLand();
+void drawLand(GLuint pid);
 
 // CALLBACK FUNC
 void motion(int x, int y);
