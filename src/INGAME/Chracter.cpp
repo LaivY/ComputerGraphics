@@ -297,7 +297,7 @@ void Character::draw(Shader& s, Camera& c)
 	glUseProgram(0);
 }
 
-void Character::update()
+void Character::update(KeyValue& keyValue)
 {
 	// 히트박스 업데이트
 	hitBox[0] = { -0.05, 0.04, -0.05 };
@@ -333,11 +333,31 @@ void Character::update()
 	{
 		hitBox[i] = t0 * r0 * glm::vec4(hitBox[i], 1);
 	}
+
+	// 캐릭터 위치에 따라 값 변경
+	if (-10.5 <= pos.z && pos.z < -1)
+	{
+		// 캐릭터 속도 증가
+		if (keyValue.get("chrSpeed") < 0.02)
+			keyValue.set("chrSpeed", 0.02);
+
+		// HP 감소 속도 증가
+		if (keyValue.get("chrHpUpdateInterval") > 100)
+			keyValue.set("chrHpUpdateInterval", 100);
+
+		// 위치에 따른 배경 색 변화
+		if (keyValue.get("Green") < (abs(pos.z) - 1) / 9)
+		{
+			keyValue.set("Green", std::min((abs(pos.z) - 1) / 9, 1.0f));
+		}
+	}
+
+	speed = keyValue.get("chrSpeed");
 }
 
-void Character::keyBoardEvent(Camera& c, std::vector<Obstacles>& obs, unsigned char key, int kx, int ky)
+void Character::keyBoardEvent(Camera& c, std::vector<Obstacles>& obs, std::vector<Item>& item, unsigned char key, int kx, int ky)
 {
-	if (isCollided(obs))
+	if (isCollided(obs, item))
 	{
 		return;
 	}
@@ -466,42 +486,120 @@ void Character::setTopCameraViewMatrix(Camera& _c, GLuint pid)
 	glUseProgram(0);
 }
 
-BOOL Character::isCollided(std::vector<Obstacles>& obs)
+BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 {
+	// 캐릭터 좌우하앞뒤 좌표
+	float lx = hitBox[0].x;
+	float rx = hitBox[1].x;
+	float ty = hitBox[0].y;
+	float by = hitBox[4].y;
+	float fz = hitBox[2].z;
+	float bz = hitBox[0].z;
+
+	float knockBackDistance = 0.025;
 	for (auto& o : obs)
 	{
 		// 큐브 충돌 체크
 		if (o.cube != nullptr)
 		{
-			float lx = o.cube->top[0].x;
-			float rx = o.cube->top[1].x;
-			float ty = o.cube->top[0].y;
-			float by = o.cube->bot[0].y;
-			float fz = o.cube->top[2].z;
-			float bz = o.cube->top[0].z;
+			// 큐브 좌우상하앞뒤 좌표
+			float _lx = o.cube->top[0].x;
+			float _rx = o.cube->top[1].x;
+			float _ty = o.cube->top[0].y;
+			float _by = o.cube->bot[0].y;
+			float _fz = o.cube->top[2].z;
+			float _bz = o.cube->top[0].z;
 
+			// 히트박스의 점이 큐브 안에 있다면
 			for (int i = 0; i < 8; i++)
 			{
-				if (lx < hitBox[i].x && hitBox[i].x < rx &&
-					by < hitBox[i].y && hitBox[i].y < ty &&
-					bz < hitBox[i].z && hitBox[i].z < fz)
+				if (_lx < hitBox[i].x && hitBox[i].x < _rx &&
+					_by < hitBox[i].y && hitBox[i].y < _ty &&
+					_bz < hitBox[i].z && hitBox[i].z < _fz)
 				{
 					// 앞면과 충돌했다면
-					if (pos.z > fz)
-						pos.z += 0.025;
+					if (pos.z > _fz)
+						pos.z += knockBackDistance;
 					// 왼쪽과 충돌했다면
-					if (pos.x < lx)
-						pos.x -= 0.025;
+					if (pos.x < _lx)
+						pos.x -= knockBackDistance;
 					// 오른쪽과 충돌했다면
-					if (pos.x > rx)
-						pos.x += 0.025;
+					if (pos.x > _rx)
+						pos.x += knockBackDistance;
 					// 뒷면과 충돌했다면
-					if (pos.z < bz)
-						pos.z -= 0.025;
+					if (pos.z < _bz)
+						pos.z -= knockBackDistance;
+					return TRUE;
+				}
+			}
+
+			// 큐브의 점이 히트박스 안에 있다면
+			for (int i = 0; i < 4; i++)
+			{
+				if (lx < o.cube->top[i].x && o.cube->top[i].x < rx &&
+					by < o.cube->top[i].y && o.cube->top[i].y < ty &&
+					bz < o.cube->top[i].z && o.cube->top[i].z < fz)
+				{
+					// 앞면과 충돌했다면
+					if (_bz < fz && fz < _fz)
+						pos.z += knockBackDistance;
+					// 왼쪽과 충돌했다면
+					if (_lx < lx && lx < _rx)
+						pos.x -= knockBackDistance;
+					// 오른쪽과 충돌했다면
+					if (_lx < rx && rx < _rx)
+						pos.x += knockBackDistance;
+					// 뒷면과 충돌했다면
+					if (_bz < bz && bz < _fz)
+						pos.z -= knockBackDistance;
+					return TRUE;
+				}
+				if (lx < o.cube->bot[i].x && o.cube->bot[i].x < rx &&
+					by < o.cube->bot[i].y && o.cube->bot[i].y < ty &&
+					bz < o.cube->bot[i].z && o.cube->bot[i].z < fz)
+				{
+					if (_bz < fz && fz < _fz)
+						pos.z += knockBackDistance;
+					if (_lx < lx && lx < _rx)
+						pos.x -= knockBackDistance;
+					if (_lx < rx && rx < _rx)
+						pos.x += knockBackDistance;
+					if (_bz < bz && bz < _fz)
+						pos.z -= knockBackDistance;
 					return TRUE;
 				}
 			}
 		}
 	}
+
+	for (int i = 0; i < item.size(); i++)
+	{
+		// 체력템
+		if (item[i].heal != nullptr)
+		{
+			float _lx = item[i].heal->top[0].x;
+			float _rx = item[i].heal->top[1].x;
+			float _ty = item[i].heal->top[0].y;
+			float _by = item[i].heal->bot[0].y;
+			float _fz = item[i].heal->top[2].z;
+			float _bz = item[i].heal->top[0].z;
+
+			// 히트박스의 점이 아이템 안에 있다면 충돌
+			for (int j = 0; j < 8; j++)
+			{
+				if (_lx < hitBox[j].x && hitBox[j].x < _rx &&
+					_by < hitBox[j].y && hitBox[j].y < _ty &&
+					_bz < hitBox[j].z && hitBox[j].z < _fz)
+				{
+					setHp(100);
+					delete item[i].heal;
+					std::vector<Item>::const_iterator iter = item.begin();
+					item.erase(iter + i);
+					return FALSE;
+				}
+			}
+		}
+	}
+
 	return FALSE;
 }

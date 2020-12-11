@@ -45,6 +45,9 @@
     <ClCompile Include="..\src\INGAME\Painter.cpp">
       <Filter>소스 파일\INGAME</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\INGAME\Item.cpp">
+      <Filter>소스 파일\INGAME</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shader\fragment.glsl">
@@ -75,6 +78,12 @@
     </ClInclude>
     <ClInclude Include="..\src\INGAME\Painter.h">
       <Filter>헤더 파일\INGAME</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\INGAME\Item.h">
+      <Filter>헤더 파일\INGAME</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\keyValues.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

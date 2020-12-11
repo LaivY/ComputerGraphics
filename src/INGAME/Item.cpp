@@ -1,7 +1,17 @@
-#include "Obstacle.h"
-#include <iostream>
+#include "Item.h"
 
-void Cube::draw(Shader& s)
+void updateItems(std::vector<Item>& item)
+{
+	for (auto& i : item)
+	{
+		if (i.heal != nullptr)
+		{
+			i.heal->angle += 10;
+		}
+	}
+}
+
+void Heal::draw(Shader& s)
 {
 	std::vector<glm::vec3> p, c;
 
@@ -69,15 +79,25 @@ void Cube::draw(Shader& s)
 			if (i < 12)
 				c.push_back(glm::vec3(0.8, 0.2, 0.2));
 			else if (12 <= i && i < 24)
-				c.push_back(glm::vec3(0.2, 0.8, 0.2));
+				c.push_back(glm::vec3(0.9, 0.2, 0.2));
 			else
-				c.push_back(glm::vec3(0.2, 0.2, 0.8));
+				c.push_back(glm::vec3(1.0, 0.2, 0.2));
 		}
 	}
 
+	// ¸ðµ¨ º¯È¯
+	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), -pos);
+	glm::mat4 r0 = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0, 0, 1));
+	glm::mat4 r1 = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0, 1, 0));
+	glm::mat4 t1 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.05 * sin(glm::radians(angle)), 0));
+	glm::mat4 t2 = glm::translate(glm::mat4(1.0f), pos);
+	glm::mat4 model = t2 * t1 * r1 * r0 * t0;
+
 	glUseProgram(s.pid);
+
 	GLuint model_matrix_location = glGetUniformLocation(s.pid, "model");
-	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(model));
 	s.setBufferData(p, c); glDrawArrays(GL_TRIANGLES, 0, 36);
+
 	glUseProgram(0);
 }

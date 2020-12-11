@@ -3,15 +3,17 @@
 #include "FRAMEWORK/Camera.h"
 #include "INGAME/Chracter.h"
 #include "INGAME/Obstacle.h"
+#include "INGAME/Item.h"
 #include "INGAME/Painter.h"
+#include "keyValues.h"
 #include "Main.h"
 
 // GLOBAL
-Shader s, _s; Camera c, _c;
-Character chr; std::vector<Obstacles> obs;
+KeyValue keyvalue;
+Shader s, _s; Camera c, _c; Character chr;
+std::vector<Obstacles> obs; std::vector<Item> item;
 
 void debug();
-void chrHpDecreaseTimer(int unused);
 void main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
@@ -25,12 +27,18 @@ void main(int argc, char** argv)
 	_s.loadShaders("../shader/vertex.glsl", "../shader/fragment.glsl");
 	iniUniformData(s.pid);
 	iniUniformData2(_s.pid);
+	iniKeyValues();
+
 	debug();
 
+	/* 콜백 함수 설정 */
 	glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyboardUp);
 	glutMotionFunc(motion);
-	glutTimerFunc(1000, chrHpDecreaseTimer, NULL);
+
+	/* 타이머 함수 설정 */
+	updateChrHpTimer(NULL);
+	updateItemTimer(NULL);
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(reShape);
@@ -39,16 +47,21 @@ void main(int argc, char** argv)
 
 GLvoid drawScene()
 {
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(keyvalue.get("Red"), keyvalue.get("Green"), keyvalue.get("Blue"), 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	// 맵
 	glEnable(GL_DEPTH_TEST);
-
-	drawMap(s, c, obs, chr);
-	drawMiniMab(s, _c, obs, chr);
-
+	drawMap(s, c, obs, item, chr);
 	glDisable(GL_DEPTH_TEST);
 
+	// 미니맵
+	drawMiniMabBGR(_s);
+	glEnable(GL_DEPTH_TEST);
+	drawMiniMab(s, _c, obs, item, chr);
+	glDisable(GL_DEPTH_TEST);
+
+	// UI
 	drawHPBar(_s, chr.getHp());
 	drawMiniMabEdge(_s);
 	drawHPBarEdge(_s);
@@ -61,15 +74,11 @@ GLvoid reShape(int w, int h)
 	glViewport(0, 0, w, h);
 }
 
-// DRAW
-
-
 // CALLBACK
 void keyboard(unsigned char key, int x, int y)
 {
-	chr.keyBoardEvent(c, obs, key, x, y);
-	//chr.setCameraViewMatrix(c, s.pid);
-	chr.update();
+	chr.keyBoardEvent(c, obs, item, key, x, y);
+	chr.update(keyvalue);
 
 	glutPostRedisplay();
 }
@@ -87,14 +96,21 @@ void motion(int x, int y)
 	glutPostRedisplay();
 }
 
-void chrHpDecreaseTimer(int unused)
+void updateChrHpTimer(int unused)
 {
 	int hp = chr.getHp();
 	if (hp > 0)
-		chr.setHp(std::max(hp - 5, 0));
+		chr.setHp(std::max(hp - 1, 0));
 
 	glutPostRedisplay();
-	glutTimerFunc(1000, chrHpDecreaseTimer, NULL);
+	glutTimerFunc(keyvalue.get("chrHpUpdateInterval"), updateChrHpTimer, NULL);
+}
+
+void updateItemTimer(int unused)
+{
+	updateItems(item);
+	glutPostRedisplay();
+	glutTimerFunc(50, updateItemTimer, NULL);
 }
 
 // INI
@@ -144,11 +160,33 @@ void iniUniformData2(GLuint pid)
 	glUseProgram(0);
 }
 
+void iniKeyValues()
+{
+	// 배경색
+	keyvalue.set("Red", 0);
+	keyvalue.set("Blue", 0);
+	keyvalue.set("Green", 0);
+
+	// 캐릭터 속도
+	keyvalue.set("chrSpeed", 0.01);
+
+	// 캐릭터 HP 깎이는 간격
+	keyvalue.set("chrHpUpdateInterval", 1000);
+}
+
 void debug()
 {
-	Obstacles temp;
-	Cube* cube = new Cube(glm::vec3(0, 0.1, -1), 0.2);
-	temp.cube = cube;
+	for (int i = 0; i < 10; i++)
+	{
+		glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.2, 1 };
+		Obstacles temp(Cube(pos, 0.1));
+		obs.push_back(temp);
+	}
 
-	obs.push_back(temp);
+	for (int i = 0; i < 10; i++)
+	{
+		glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.2, -1 };
+		Item temp(Heal(pos, 0.05));
+		item.push_back(temp);
+	}
 }
