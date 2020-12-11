@@ -13,6 +13,7 @@
 class Character
 {
 private:
+	int hp = 100;											// 캐릭터 체력
 	int dir = FRONT; float speed = 0.01;					// 캐릭터 방향, 이동속도
 	// float x = 0, y = 0.16, z = 0;
 	glm::vec3 pos = { 0, 0.16, 0 }; glm::vec3 hitBox[8];	// 캐릭터 좌표, 히트박스
@@ -29,4 +30,6 @@ public:
 	BOOL isCollided(std::vector<Obstacles>& cube);
 
 	glm::vec3 getPos() { return pos; }
+	int getHp() { return hp; }
+	void setHp(int _hp) { hp = _hp; }
 };

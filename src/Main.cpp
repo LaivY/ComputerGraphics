@@ -3,13 +3,15 @@
 #include "FRAMEWORK/Camera.h"
 #include "INGAME/Chracter.h"
 #include "INGAME/Obstacle.h"
+#include "INGAME/Painter.h"
 #include "Main.h"
 
 // GLOBAL
-Shader s; Camera c, _c;
+Shader s, _s; Camera c, _c;
 Character chr; std::vector<Obstacles> obs;
 
 void debug();
+void chrHpDecreaseTimer(int unused);
 void main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
@@ -20,12 +22,15 @@ void main(int argc, char** argv)
 	glewInit();
 
 	s.loadShaders("../shader/vertex.glsl", "../shader/fragment.glsl");
+	_s.loadShaders("../shader/vertex.glsl", "../shader/fragment.glsl");
 	iniUniformData(s.pid);
+	iniUniformData2(_s.pid);
 	debug();
 
 	glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyboardUp);
 	glutMotionFunc(motion);
+	glutTimerFunc(1000, chrHpDecreaseTimer, NULL);
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(reShape);
@@ -36,33 +41,18 @@ GLvoid drawScene()
 {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glEnable(GL_DEPTH_TEST);
 
-	// 메인 화면
-	glViewport(0, 0, 800, 600);
-	chr.setCameraViewMatrix(c, s.pid);
-
-	drawLand(s.pid);
-	chr.draw(s, c);
-	for (auto& i : obs)
-	{
-		if (i.cube != nullptr)
-			i.cube->draw(s);
-	}
-
-	// 미니맵
-	glViewport(560, 420, 240, 180);
-	chr.setTopCameraViewMatrix(_c, s.pid);
-
-	drawLand(s.pid);
-	chr.draw(s, _c);
-	for (auto& i : obs)
-	{
-		if (i.cube != nullptr)
-			i.cube->draw(s);
-	}
+	drawMap(s, c, obs, chr);
+	drawMiniMab(s, _c, obs, chr);
 
 	glDisable(GL_DEPTH_TEST);
+
+	drawHPBar(_s, chr.getHp());
+	drawMiniMabEdge(_s);
+	drawHPBarEdge(_s);
+
 	glutSwapBuffers();
 }
 
@@ -72,125 +62,7 @@ GLvoid reShape(int w, int h)
 }
 
 // DRAW
-void drawLand(GLuint pid)
-{
-	float cube[] =
-	{
-		// 상
-		-1.0,  1.0, -1.0,
-		1.0,  1.0, -1.0,
-		1.0,  1.0,  1.0,
-		1.0,  1.0,  1.0,
-		-1.0,  1.0,  1.0,
-		-1.0,  1.0, -1.0,
 
-		// 하
-		-1.0, -1.0, -1.0,
-		1.0, -1.0, -1.0,
-		1.0, -1.0,  1.0,
-		1.0, -1.0,  1.0,
-		-1.0, -1.0,  1.0,
-		-1.0, -1.0, -1.0,
-
-		// 앞
-		-1.0, -1.0,  1.0,
-		1.0, -1.0,  1.0,
-		1.0,  1.0,  1.0,
-		1.0,  1.0,  1.0,
-		-1.0,  1.0,  1.0,
-		-1.0, -1.0,  1.0,
-
-		// 뒤
-		-1.0, -1.0, -1.0,
-		1.0, -1.0, -1.0,
-		1.0,  1.0, -1.0,
-		1.0,  1.0, -1.0,
-		-1.0,  1.0, -1.0,
-		-1.0, -1.0, -1.0,
-
-		// 좌
-		-1.0,  1.0,  1.0,
-		-1.0,  1.0, -1.0,
-		-1.0, -1.0, -1.0,
-		-1.0, -1.0, -1.0,
-		-1.0, -1.0,  1.0,
-		-1.0,  1.0,  1.0,
-
-		// 우
-		1.0,  1.0,  1.0,
-		1.0,  1.0, -1.0,
-		1.0, -1.0, -1.0,
-		1.0, -1.0, -1.0,
-		1.0, -1.0,  1.0,
-		1.0,  1.0,  1.0
-	};
-
-	float color[] =
-	{
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-	};
-
-	std::vector<glm::vec3> pos, rgb;
-	for (int i = 0; i < sizeof(cube) / sizeof(cube[0]); i += 3)
-	{
-		glm::vec3 p = { cube[i], cube[i + 1], cube[i + 2] };
-		pos.push_back(p);
-	}
-	for (int i = 0; i < sizeof(color) / sizeof(color[0]); i += 3)
-	{
-		glm::vec3 c = { color[i], color[i + 1], color[i + 2] };
-		rgb.push_back(c);
-	}
-
-	glUseProgram(pid);
-
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 10));
-	GLuint model_matrix_location = glGetUniformLocation(pid, "model");
-	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(scale));
-	s.setBufferData(pos, rgb); glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	glUseProgram(0);
-}
 
 // CALLBACK
 void keyboard(unsigned char key, int x, int y)
@@ -215,7 +87,17 @@ void motion(int x, int y)
 	glutPostRedisplay();
 }
 
-// ini
+void chrHpDecreaseTimer(int unused)
+{
+	int hp = chr.getHp();
+	if (hp > 0)
+		chr.setHp(std::max(hp - 5, 0));
+
+	glutPostRedisplay();
+	glutTimerFunc(1000, chrHpDecreaseTimer, NULL);
+}
+
+// INI
 void iniUniformData(GLuint pid)
 {
 	glUseProgram(pid);
@@ -240,6 +122,24 @@ void iniUniformData(GLuint pid)
 	glm::mat4 view = glm::lookAt(eye, eye + at, up);
 	GLuint view_matrix_location = glGetUniformLocation(pid, "view");
 	glUniformMatrix4fv(view_matrix_location, 1, GL_FALSE, glm::value_ptr(view));
+
+	glUseProgram(0);
+}
+
+void iniUniformData2(GLuint pid)
+{
+	glUseProgram(pid);
+
+	// 모델, 뷰, 투영 변환 초기화
+	glm::mat4 base(1.0f);
+	GLuint model_matrix_location = glGetUniformLocation(pid, "model");
+	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(base));
+
+	GLuint view_matrix_location = glGetUniformLocation(pid, "view");
+	glUniformMatrix4fv(view_matrix_location, 1, GL_FALSE, glm::value_ptr(base));
+
+	GLuint proj_matrix_location = glGetUniformLocation(pid, "proj");
+	glUniformMatrix4fv(proj_matrix_location, 1, GL_FALSE, glm::value_ptr(base));
 
 	glUseProgram(0);
 }

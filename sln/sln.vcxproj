@@ -143,6 +143,7 @@
     <ClCompile Include="..\src\FRAMEWORK\Shader.cpp" />
     <ClCompile Include="..\src\INGAME\Chracter.cpp" />
     <ClCompile Include="..\src\INGAME\Obstacle.cpp" />
+    <ClCompile Include="..\src\INGAME\Painter.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +156,7 @@
     <ClInclude Include="..\src\FRAMEWORK\Shader.h" />
     <ClInclude Include="..\src\INGAME\Chracter.h" />
     <ClInclude Include="..\src\INGAME\Obstacle.h" />
+    <ClInclude Include="..\src\INGAME\Painter.h" />
     <ClInclude Include="..\src\Main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

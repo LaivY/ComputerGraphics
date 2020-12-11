@@ -453,7 +453,7 @@ void Character::setTopCameraViewMatrix(Camera& _c, GLuint pid)
 	// 카메라 위치
 	glm::vec4 _eye(0, 0, 0, 1);
 	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), pos);
-	glm::mat4 t1 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 1, 0));
+	glm::mat4 t1 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 2, 0));
 	_eye = t1 * t0 * _eye;
 
 	glUseProgram(pid);

@@ -14,3 +14,4 @@ void keyboardUp(unsigned char key, int x, int y);
 
 // INI FUNC
 void iniUniformData(GLuint pid);
+void iniUniformData2(GLuint pid);
