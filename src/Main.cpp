@@ -128,7 +128,10 @@ void updateChrHpTimer(int unused)
 
 void updateItemTimer(int unused)
 {
-	updateItems(item);
+	for (auto& i : item)
+	{
+		i.update();
+	}
 	glutPostRedisplay();
 	glutTimerFunc(50, updateItemTimer, NULL);
 }
@@ -197,7 +200,7 @@ void iniKeyValues()
 	keyValue.set("Green", 0);
 
 	// 캐릭터 속도
-	keyValue.set("chrSpeed", 0.01);
+	keyValue.set("chrSpeed", 0.02);
 
 	// 캐릭터 HP 깎이는 간격
 	keyValue.set("chrHpUpdateInterval", 1000);
@@ -206,14 +209,8 @@ void iniKeyValues()
 void debug()
 {
 	{
-		glm::vec3 pos = { 0, 0.3, -2 };
-		Obstacles temp(VCube(pos, 0.13, 0.01, 10));
-		obs.push_back(temp);
-	}
-
-	{
-		glm::vec3 pos = { 0, 0.3, -2 };
-		Obstacles temp(HCube(pos, 0.13, 0.01));
+		glm::vec3 pos = { 0, 0.3, -0.5 };
+		Obstacles temp(Cube(pos, 0.13));
 		obs.push_back(temp);
 	}
 

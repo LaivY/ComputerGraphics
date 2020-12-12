@@ -38,11 +38,10 @@ class Item
 public:
 	Heal* heal = nullptr;
 
-	Item(){}
+	void update();
+
 	Item(Heal _heal)
 	{
 		heal = new Heal(_heal);
 	}
 };
-
-void updateItems(std::vector<Item>& item);

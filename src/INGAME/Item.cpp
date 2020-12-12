@@ -1,16 +1,5 @@
 #include "Item.h"
 
-void updateItems(std::vector<Item>& item)
-{
-	for (auto& i : item)
-	{
-		if (i.heal != nullptr)
-		{
-			i.heal->angle += 10;
-		}
-	}
-}
-
 void Heal::draw(Shader& s)
 {
 	std::vector<glm::vec3> p, c;
@@ -100,4 +89,10 @@ void Heal::draw(Shader& s)
 	s.setBufferData(p, c); glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glUseProgram(0);
+}
+
+void Item::update()
+{
+	if (heal != nullptr)
+		heal->angle += 10;
 }

@@ -322,7 +322,7 @@ void Character::keyBoardEvent(Camera& c, std::vector<Obstacles>& obs, std::vecto
 	}
 	else if (key == ' ' && !dy)
 	{
-		dy = 0.09;
+		dy = 0.08;
 	}
 }
 
