@@ -17,7 +17,7 @@ class Character
 private:
 	int hp = 100;											// 캐릭터 체력
 	int dir = FRONT; float speed = 0;					// 캐릭터 방향, 이동속도
-	glm::vec3 pos = { 0, 0.16, -0 }; glm::vec3 hitBox[8];	// 캐릭터 좌표, 히트박스
+	glm::vec3 pos = { 0, 0.16, -6 }; glm::vec3 hitBox[8];	// 캐릭터 좌표, 히트박스
 	float angle = 0, aAngle = 0, lAngle = 0, rAngle = 0;    // 타이머, 팔, 다리, 회전 각도
 
 public:

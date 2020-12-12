@@ -83,6 +83,7 @@ void Cube::draw(Shader& s)
 }
 void HCube::draw(Shader& s)
 {
+	
 	std::vector<glm::vec3> p, c;
 
 	// 큐브 위치 설정

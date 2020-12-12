@@ -13,14 +13,13 @@ KeyValue keyvalue;
 Shader s, _s; Camera c, _c; Character chr;
 std::vector<Obstacles> obs; std::vector<Item> item;
 
-float h1dx = 0.000;
-float h1ddx = 0.002;
+
 float h1dz = 0.00;
 
-float h2dx = 0;
-float h2dz = 0.00;
-float h2ddx = 0.002;
 
+float h2dz = 0.00;
+
+float h1ddx = 0.002;
 float ddz = 0.002;
 void debug();
 void main(int argc, char** argv)
@@ -84,7 +83,8 @@ GLvoid reShape(int w, int h)
 {
 	glViewport(0, 0, w, h);
 }
-
+float h2dx = 0;
+float h2ddx = 0.002;
 // CALLBACK
 void keyboard(unsigned char key, int x, int y)
 {
@@ -121,31 +121,36 @@ void updateItemTimer(int unused)
 }
 void updateHObsTimer(int unused)
 {
-
+	
+	
 	for (auto& o : obs)
 	{
 		if (o.hcube != nullptr)
 		{
-
-			if (h1dx < -3.2)
+			
+			if (o.hcube->dx < 0.0)
 			{
-				h1ddx = -h1ddx;
-			}
-			else if (h1dx > 0.0)
-			{
-				h1ddx = -h1ddx;
+				o.hcube->ddx = -o.hcube->ddx;
+				 
 
 			}
+			else if (o.hcube->dx > 1.6)
+			{
+				o.hcube->ddx = -o.hcube->ddx;
 
-			h1dx += h1ddx;
+			}
+
+			o.hcube->dx += o.hcube->ddx;
+			printf("b : %f\n", o.hcube->ddx);
 
 
 			for (int i = 0; i < 4; i++)
 			{
-				o.hcube->bot[i].x -= h1ddx;
-				o.hcube->top[i].x -= h1ddx;
+				o.hcube->bot[i].x += o.hcube->ddx;
+				o.hcube->top[i].x += o.hcube->ddx;
 
 			}
+			printf("re : %f\n", o.hcube->dx);
 
 
 
@@ -159,33 +164,37 @@ void updateHObsTimer(int unused)
 }
 void updateH2ObsTimer(int unused)
 {
-	float count = 0;
+	
 	for (auto& o : obs)
 	{
 		if (o.h2cube != nullptr)
 		{
-			count++;
-			if (h2dx < -20*count)
+
+			if (o.h2cube->dx < -1.6)
 			{
-				h2ddx = -h2ddx;
+				o.h2cube->ddx = -o.h2cube->ddx;
+
+
 			}
-			else if (h2dx > 0.0)
+			else if (o.h2cube->dx > 0.0)
 			{
-				h2ddx = -h2ddx;
+				o.h2cube->ddx = -o.h2cube->ddx;
 
 			}
 
-			h2dx += h2ddx;
-			
+			o.h2cube->dx += o.h2cube->ddx;
+			printf("b : %f\n", o.h2cube->ddx);
+
 
 			for (int i = 0; i < 4; i++)
 			{
-				o.h2cube->bot[i].x += h2ddx;
-				o.h2cube->top[i].x += h2ddx;
+				o.h2cube->bot[i].x += o.h2cube->ddx;
+				o.h2cube->top[i].x += o.h2cube->ddx;
 
 			}
-			
-			
+			printf("re : %f\n", o.h2cube->dx);
+
+
 
 
 		}
@@ -203,25 +212,29 @@ void updateVObsTimer(int unused)
 		if (o.vcube != nullptr)
 		{
 
-			if (h1dz < -0.2)
+			if (o.vcube->dz < -1.8)
 			{
-				ddz = -ddz;
-			}
-			else if (h1dz > 1.8)
-			{
-				ddz = -ddz;
+				o.vcube->ddz = -o.vcube->ddz;
+
 
 			}
-			h1dz += ddz;
+			else if (o.vcube->dz > 0.0)
+			{
+				o.vcube->ddz = -o.vcube->ddz;
 
+			}
+
+			o.vcube->dz += o.vcube->ddz;
+			printf("b : %f\n", o.vcube->ddz);
 
 
 			for (int i = 0; i < 4; i++)
 			{
-				o.vcube->bot[i].z += ddz;
-				o.vcube->top[i].z += ddz;
-				
+				o.vcube->bot[i].z -= o.vcube->ddz;
+				o.vcube->top[i].z -= o.vcube->ddz;
+
 			}
+			printf("re : %f\n", o.vcube->dz);
 
 
 
@@ -245,7 +258,7 @@ void updateV2ObsTimer(int unused)
 			{
 				ddz = -ddz;
 			}
-			else if (h1dz > 1.3)
+			else if (h1dz > 1.0)
 			{
 				ddz = -ddz;
 
@@ -258,10 +271,11 @@ void updateV2ObsTimer(int unused)
 			{
 				o.vcube->bot[i].z += ddz;
 				o.vcube->top[i].z += ddz;
-				printf("%f\n", h1dz);
+				
+
 			}
 
-
+			
 
 
 		}
@@ -776,7 +790,7 @@ void debug()
 	int pattern = 0;
 	for (int i=0;i < 10;i++)
 	{
-		pattern = 0;//rand() % 5 ;
+		pattern = rand() % 5 ;
 		if (pattern == 0)
 		{
 			hzone(z);
@@ -798,7 +812,8 @@ void debug()
 			zige(z);
 		}
 		z -= 4;
-		printf("%d\n", pattern);
+		
+		("%d\n", pattern);
 	}
 	
 	//side_maze(z);

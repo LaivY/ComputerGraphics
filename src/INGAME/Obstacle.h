@@ -28,6 +28,8 @@ class HCube
 public:
 	// 왼쪽위, 오른쪽위, 왼쪽아래, 오른쪽아래 순서
 	glm::vec3 top[4], bot[4];
+	float dx = 0.00;
+	float ddx = 0.002;
 	HCube(glm::vec3 p, float r)
 	{
 		top[0] = { p.x - r, p.y + 2 * r, p.z - r };
@@ -45,9 +47,12 @@ public:
 };
 class H2Cube
 {
+	
 public:
 	// 왼쪽위, 오른쪽위, 왼쪽아래, 오른쪽아래 순서
 	glm::vec3 top[4], bot[4];
+	float dx = 0.00;
+	float ddx = -0.002;
 	H2Cube(glm::vec3 p, float r)
 	{
 		top[0] = { p.x - r, p.y + 2 * r, p.z - r };
@@ -69,6 +74,8 @@ class VCube
 public:
 	// 왼쪽위, 오른쪽위, 왼쪽아래, 오른쪽아래 순서
 	glm::vec3 top[4], bot[4];
+	float dz = 0.00;
+	float ddz = 0.01;
 	VCube(glm::vec3 p, float r)
 	{
 		top[0] = { p.x - r, p.y + r, p.z - r };
