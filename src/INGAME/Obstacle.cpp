@@ -1,8 +1,27 @@
 #include "Obstacle.h"
 #include <iostream>
 
-void Cube::draw(Shader& s)
+void Obstacles::draw(Shader& s)
 {
+	// 히트박스 설정
+	glm::vec3 top[4], bot[4];
+	if (cube != nullptr)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			top[i] = cube->top[i];
+			bot[i] = cube->bot[i];
+		}
+	}
+	else if (hCube != nullptr)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			top[i] = hCube->top[i];
+			bot[i] = hCube->bot[i];
+		}
+	}
+
 	std::vector<glm::vec3> p, c;
 
 	// 큐브 위치 설정
@@ -80,4 +99,31 @@ void Cube::draw(Shader& s)
 	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 	s.setBufferData(p, c); glDrawArrays(GL_TRIANGLES, 0, 36);
 	glUseProgram(0);
+}
+
+void Obstacles::update()
+{
+	// 좌우 큐브 업데이트
+	if (hCube != nullptr)
+	{
+		// 왼쪽 끝을 넘어갔다면
+		if (hCube->pos.x < -4)
+		{
+			hCube->dx = abs(hCube->dx);
+		}
+
+		// 오른쪽 끝을 넘어갔다면
+		else if (hCube->pos.x > 4)
+		{
+			hCube->dx = -abs(hCube->dx);
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			hCube->pos.x += hCube->dx;
+			hCube->top[i].x += hCube->dx;
+			hCube->bot[i].x += hCube->dx;
+		}
+	}
+	glutPostRedisplay();
 }

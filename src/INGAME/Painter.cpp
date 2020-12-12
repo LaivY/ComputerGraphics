@@ -130,8 +130,7 @@ void drawMap(Shader& s, Camera& c, std::vector<Obstacles>& obs, std::vector<Item
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
-		if (i.cube != nullptr)
-			i.cube->draw(s);
+		i.draw(s);
 	}
 	for (auto& i : item)
 	{
@@ -150,8 +149,7 @@ void drawMiniMab(Shader& s, Camera& c, std::vector<Obstacles>& obs, std::vector<
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
-		if (i.cube != nullptr)
-			i.cube->draw(s);
+		i.draw(s);
 	}
 	for (auto& i : item)
 	{

@@ -40,6 +40,7 @@ void main(int argc, char** argv)
 	updateChrPosTimer(NULL);
 	updateChrHpTimer(NULL);
 	updateItemTimer(NULL);
+	updateObsTimer(NULL);
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(reShape);
@@ -114,6 +115,15 @@ void updateItemTimer(int unused)
 	glutTimerFunc(50, updateItemTimer, NULL);
 }
 
+void updateObsTimer(int unused)
+{
+	for (auto& o : obs)
+	{
+		o.update();
+	}
+	glutTimerFunc(30, updateObsTimer, NULL);
+}
+
 // INI
 void iniUniformData(GLuint pid)
 {
@@ -177,10 +187,10 @@ void iniKeyValues()
 
 void debug()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
-		glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.45, -2 };
-		Obstacles temp(Cube(pos, 0.1));
+		glm::vec3 pos = { 0, 0.2 + 0.1 * i, -2 };
+		Obstacles temp(HCube(pos, 0.13, 0.001 * i));
 		obs.push_back(temp);
 	}
 
@@ -190,4 +200,6 @@ void debug()
 		Item a = Heal(pos);
 		item.push_back(a);
 	}
+
+	glm::vec3 t = { 1, 2, 3 };
 }

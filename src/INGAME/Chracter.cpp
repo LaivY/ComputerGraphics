@@ -382,16 +382,15 @@ void Character::updateHP()
 
 void Character::updateHitBox()
 {
-	// 히트박스 업데이트
-	hitBox[0] = { -0.05, 0.09, -0.05 };
-	hitBox[1] = { 0.05, 0.09, -0.05 };
-	hitBox[2] = { -0.05, 0.09,  0.05 };
-	hitBox[3] = { 0.05, 0.09,  0.05 };
+	hitBox[0] = { -0.10, 0.09, -0.05 };
+	hitBox[1] = {  0.10, 0.09, -0.05 };
+	hitBox[2] = { -0.10, 0.09,  0.05 };
+	hitBox[3] = {  0.10, 0.09,  0.05 };
 
-	hitBox[4] = { -0.05, -0.18, -0.05 };
-	hitBox[5] = { 0.05, -0.18, -0.05 };
-	hitBox[6] = { -0.05, -0.18,  0.05 };
-	hitBox[7] = { 0.05, -0.18,  0.05 };
+	hitBox[4] = { -0.10, -0.18, -0.05 };
+	hitBox[5] = {  0.10, -0.18, -0.05 };
+	hitBox[6] = { -0.10, -0.18,  0.05 };
+	hitBox[7] = {  0.10, -0.18,  0.05 };
 
 	GLfloat CHR_GLOBAL_ROTATION_ANGLE = 0;
 	switch (dir)
@@ -538,109 +537,125 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 	float knockBackDistance = 0.025;
 	for (auto& o : obs)
 	{
-		// 큐브 충돌 체크
+		// 충돌 체크에 사용할 변수 선언
+		float _lx, _rx;
+		float _ty, _by;
+		float _fz, _bz;
+		glm::vec3 top[4], bot[4], center; float radius;
+
+		// 큐브 세팅
 		if (o.cube != nullptr)
 		{
-			// 큐브 좌우상하앞뒤 좌표
-			float _lx = o.cube->top[0].x;
-			float _rx = o.cube->top[1].x;
-			float _ty = o.cube->top[0].y;
-			float _by = o.cube->bot[0].y;
-			float _fz = o.cube->top[2].z;
-			float _bz = o.cube->top[0].z;
-
-			// 윗면과 충돌했다면
-			for (int i = 0; i < 8; i++)
-			{
-				if (_lx < hitBox[i].x && hitBox[i].x < _rx &&
-					by < _ty && _ty < ty &&
-					_bz < hitBox[i].z && hitBox[i].z < _fz)
-				{
-					dy = 0;
-					isFalling = FALSE;
-					goto ITEM_CHECK;
-				}
-			}
-
-			// 히트박스의 점이 큐브 안에 있다면
-			for (int i = 0; i < 8; i++)
-			{
-				if (_lx < hitBox[i].x && hitBox[i].x < _rx &&
-					_by < hitBox[i].y && hitBox[i].y < _ty &&
-					_bz < hitBox[i].z && hitBox[i].z < _fz)
-				{
-					// 앞면과 충돌했다면
-					if (pos.z > _fz)
-					{
-						pos.z += knockBackDistance;
-						isCollided = TRUE;
-					}
-					// 왼쪽과 충돌했다면
-					else if (pos.x < _lx)
-					{
-						pos.x -= knockBackDistance;
-						isCollided = TRUE;
-					}
-					// 오른쪽과 충돌했다면
-					else if (pos.x > _rx)
-					{
-						pos.x += knockBackDistance;
-						isCollided = TRUE;
-					}
-					// 뒷면과 충돌했다면
-					else if (pos.z < _bz)
-					{
-						pos.z -= knockBackDistance;
-						isCollided = TRUE;
-					}
-					// 대각선 충돌
-					else
-					{
-						pos.x += knockBackDistance * sin(glm::radians(rAngle + 180));
-						pos.z -= knockBackDistance * cos(glm::radians(rAngle + 180));
-						isCollided = TRUE;
-					}
-
-					if (isCollided)
-						goto ITEM_CHECK;
-				}
-			}
-
-			// 큐브의 점이 히트박스 안에 있다면
+			// 좌우상하앞뒤
+			_lx = o.cube->top[0].x;
+			_rx = o.cube->top[1].x;
+			_ty = o.cube->top[0].y;
+			_by = o.cube->bot[0].y;
+			_fz = o.cube->top[2].z;
+			_bz = o.cube->top[0].z;
 			for (int i = 0; i < 4; i++)
 			{
-				if (lx < o.cube->top[i].x && o.cube->top[i].x < rx &&
-					by < o.cube->top[i].y && o.cube->top[i].y < ty &&
-					bz < o.cube->top[i].z && o.cube->top[i].z < fz)
+				top[i] = o.cube->top[i];
+				bot[i] = o.cube->bot[i];
+			}
+			center = o.cube->pos;
+			radius = o.cube->radius;
+		}
+
+		// 좌우큐브 세팅
+		else if (o.hCube != nullptr)
+		{
+			_lx = o.hCube->top[0].x;
+			_rx = o.hCube->top[1].x;
+			_ty = o.hCube->top[0].y;
+			_by = o.hCube->bot[0].y;
+			_fz = o.hCube->top[2].z;
+			_bz = o.hCube->top[0].z;
+			for (int i = 0; i < 4; i++)
+			{
+				top[i] = o.hCube->top[i];
+				bot[i] = o.hCube->bot[i];
+			}
+			center = o.hCube->pos;
+			radius = o.hCube->radius;
+		}
+
+		// 윗면과 충돌했다면
+		for (int i = 0; i < 8; i++)
+		{
+			if (_lx < hitBox[i].x && hitBox[i].x < _rx &&
+				_ty <= by && by < _ty + 0.03 &&
+				_bz < hitBox[i].z && hitBox[i].z < _fz)
+			{
+				dy = 0;
+				pos.y = center.y + radius + 0.18;
+				isFalling = FALSE;
+			}
+		}
+
+		// 히트박스의 점이 큐브 안에 있다면
+		for (int i = 0; i < 8; i++)
+		{
+			if (_lx < hitBox[i].x && hitBox[i].x < _rx &&
+				_by < hitBox[i].y && hitBox[i].y < _ty &&
+				_bz < hitBox[i].z && hitBox[i].z < _fz)
+			{
+				// 앞면과 충돌했다면
+				if (pos.z > _fz)
 				{
-					// 앞면과 충돌했다면
-					if (_bz < fz && fz < _fz)
-						pos.z += knockBackDistance;
-					// 왼쪽과 충돌했다면
-					if (_lx < lx && lx < _rx)
-						pos.x -= knockBackDistance;
-					// 오른쪽과 충돌했다면
-					if (_lx < rx && rx < _rx)
-						pos.x += knockBackDistance;
-					// 뒷면과 충돌했다면
-					if (_bz < bz && bz < _fz)
-						pos.z -= knockBackDistance;
-					return TRUE;
+					pos.z += knockBackDistance;
+					isCollided = TRUE;
 				}
-				if (lx < o.cube->bot[i].x && o.cube->bot[i].x < rx &&
-					by < o.cube->bot[i].y && o.cube->bot[i].y < ty &&
-					bz < o.cube->bot[i].z && o.cube->bot[i].z < fz)
+				// 왼쪽과 충돌했다면
+				else if (pos.x < _lx)
 				{
-					if (_bz < fz && fz < _fz)
-						pos.z += knockBackDistance;
-					if (_lx < lx && lx < _rx)
-						pos.x -= knockBackDistance;
-					if (_lx < rx && rx < _rx)
-						pos.x += knockBackDistance;
-					if (_bz < bz && bz < _fz)
-						pos.z -= knockBackDistance;
-					return TRUE;
+					pos.x -= knockBackDistance;
+					isCollided = TRUE;
 				}
+				// 오른쪽과 충돌했다면
+				else if (pos.x > _rx)
+				{
+					pos.x += knockBackDistance;
+					isCollided = TRUE;
+				}
+				// 뒷면과 충돌했다면
+				else if (pos.z < _bz)
+				{
+					pos.z -= knockBackDistance;
+					isCollided = TRUE;
+				}
+				// 대각선 충돌
+				else
+				{
+					pos.x += knockBackDistance * sin(glm::radians(rAngle + 180));
+					pos.z -= knockBackDistance * cos(glm::radians(rAngle + 180));
+					isCollided = TRUE;
+				}
+
+				if (isCollided)
+					goto ITEM_CHECK;
+			}
+		}
+
+		// 큐브의 점이 히트박스 안에 있다면
+		for (int i = 0; i < 4; i++)
+		{
+			if (lx < top[i].x && top[i].x < rx &&
+				by < top[i].y && top[i].y < ty &&
+				bz < top[i].z && top[i].z < fz)
+			{
+				pos.x += knockBackDistance * sin(glm::radians(rAngle + 180));
+				pos.z -= knockBackDistance * cos(glm::radians(rAngle + 180));
+				isCollided = TRUE;
+			}
+
+			else if (lx < bot[i].x && bot[i].x < rx &&
+				by < bot[i].y && bot[i].y < ty &&
+				bz < bot[i].z && bot[i].z < fz)
+			{
+				pos.x += knockBackDistance * sin(glm::radians(rAngle + 180));
+				pos.z -= knockBackDistance * cos(glm::radians(rAngle + 180));
+				isCollided = TRUE;
 			}
 		}
 	}

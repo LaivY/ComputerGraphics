@@ -12,6 +12,7 @@ void keyboardUp(unsigned char key, int x, int y);
 void updateChrPosTimer(int unused);
 void updateChrHpTimer(int unused);
 void updateItemTimer(int unused);
+void updateObsTimer(int unused);
 
 // INI FUNC
 void iniUniformData(GLuint pid);
