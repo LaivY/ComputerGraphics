@@ -1,6 +1,6 @@
 #include "Painter.h"
 
-void drawLand(Shader& s)
+void drawLand(Shader& s, Character& chr)
 {
 	float cube[] =
 	{
@@ -112,39 +112,91 @@ void drawLand(Shader& s)
 
 	glUseProgram(s.pid);
 
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 10));
+	glm::mat4 s0 = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 50));
+	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, chr.getPos().z));
 	GLuint model_matrix_location = glGetUniformLocation(s.pid, "model");
-	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(scale));
+	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(t0 * s0));
 	s.setBufferData(pos, rgb); glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glUseProgram(0);
 }
 
-void drawMap(Shader& s, Camera& c, std::vector<Obstacles>& obs, Character& chr)
+void drawMap(Shader& s, Camera& c, std::vector<Obstacles>& obs, std::vector<Item>& item, Character& chr)
 {
 	glViewport(0, 0, 800, 600);
 	chr.setCameraViewMatrix(c, s.pid);
 
-	drawLand(s);
+	drawLand(s, chr);
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
 		if (i.cube != nullptr)
 			i.cube->draw(s);
 	}
+	for (auto& i : obs)
+	{
+		if (i.mcube != nullptr)
+			i.mcube->draw(s);
+	}
+	for (auto& i : obs)
+	{
+		if (i.hcube != nullptr)
+			i.hcube->draw(s);
+	}
+	for (auto& i : obs)
+	{
+		if (i.h2cube != nullptr)
+			i.h2cube->draw(s);
+	}
+	for (auto& i : obs)
+	{
+		if (i.vcube != nullptr)
+			i.vcube->draw(s);
+	}
+	for (auto& i : item)
+	{
+		if (i.heal != nullptr)
+			i.heal->draw(s);
+	}
 }
 
-void drawMiniMab(Shader& s, Camera& c, std::vector<Obstacles>& obs, Character& chr)
+void drawMiniMab(Shader& s, Camera& c, std::vector<Obstacles>& obs, std::vector<Item>& item, Character& chr)
 {
+	glClear(GL_DEPTH_BUFFER_BIT);
 	glViewport(800 - 160, 600 - 120, 160, 120);
 	chr.setTopCameraViewMatrix(c, s.pid);
 
-	drawLand(s);
+	drawLand(s, chr);
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
 		if (i.cube != nullptr)
 			i.cube->draw(s);
+	}
+	for (auto& i : obs)
+	{
+		if (i.mcube != nullptr)
+			i.mcube->draw(s);
+	}
+	for (auto& i : obs)
+	{
+		if (i.hcube != nullptr)
+			i.hcube->draw(s);
+	}
+	for (auto& i : obs)
+	{
+		if (i.h2cube != nullptr)
+			i.h2cube->draw(s);
+	}
+	for (auto& i : obs)
+	{
+		if (i.vcube != nullptr)
+			i.vcube->draw(s);
+	}
+	for (auto& i : item)
+	{
+		if (i.heal != nullptr)
+			i.heal->draw(s);
 	}
 }
 
