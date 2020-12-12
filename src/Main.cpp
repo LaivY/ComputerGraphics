@@ -35,6 +35,7 @@ void main(int argc, char** argv)
 	glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyboardUp);
 	glutMotionFunc(motion);
+	glutMouseWheelFunc(wheel);
 
 	/* 타이머 함수 설정 */
 	updateChrPosTimer(NULL);
@@ -77,6 +78,13 @@ GLvoid reShape(int w, int h)
 }
 
 // CALLBACK
+void motion(int x, int y)
+{
+	chr.mouseMotionEvent(c, x, y);
+	chr.setCameraViewMatrix(c, s.pid);
+	glutPostRedisplay();
+}
+
 void keyboard(unsigned char key, int x, int y)
 {
 	chr.keyBoardEvent(c, obs, item, key, x, y);
@@ -89,11 +97,21 @@ void keyboardUp(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-void motion(int x, int y)
+void wheel(int wheel, int direction, int x, int y)
 {
-	chr.mouseMotionEvent(c, x, y);
-	chr.setCameraViewMatrix(c, s.pid);
-	glutPostRedisplay();
+	// 확대
+	if (direction == 1)
+	{
+		c.radius -= 0.05;
+		c.radius = std::max(0.3f, c.radius);
+	}
+
+	// 축소
+	else if(direction == -1)
+	{
+		c.radius += 0.05;
+		c.radius = std::min(1.0f, c.radius);
+	}
 }
 
 void updateChrPosTimer(int unused)
@@ -179,7 +197,7 @@ void iniKeyValues()
 	keyValue.set("Green", 0);
 
 	// 캐릭터 속도
-	keyValue.set("chrSpeed", 0.05);
+	keyValue.set("chrSpeed", 0.01);
 
 	// 캐릭터 HP 깎이는 간격
 	keyValue.set("chrHpUpdateInterval", 1000);
@@ -187,10 +205,15 @@ void iniKeyValues()
 
 void debug()
 {
-	for (int i = 0; i < 1; i++)
 	{
-		glm::vec3 pos = { 0, 0.2 + 0.1 * i, -2 };
-		Obstacles temp(HCube(pos, 0.13, 0.001 * i));
+		glm::vec3 pos = { 0, 0.3, -2 };
+		Obstacles temp(VCube(pos, 0.13, 0.01, 10));
+		obs.push_back(temp);
+	}
+
+	{
+		glm::vec3 pos = { 0, 0.3, -2 };
+		Obstacles temp(HCube(pos, 0.13, 0.01));
 		obs.push_back(temp);
 	}
 
@@ -200,6 +223,4 @@ void debug()
 		Item a = Heal(pos);
 		item.push_back(a);
 	}
-
-	glm::vec3 t = { 1, 2, 3 };
 }

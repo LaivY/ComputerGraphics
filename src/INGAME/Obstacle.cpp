@@ -21,6 +21,14 @@ void Obstacles::draw(Shader& s)
 			bot[i] = hCube->bot[i];
 		}
 	}
+	else if (vCube != nullptr)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			top[i] = vCube->top[i];
+			bot[i] = vCube->bot[i];
+		}
+	}
 
 	std::vector<glm::vec3> p, c;
 
@@ -107,13 +115,13 @@ void Obstacles::update()
 	if (hCube != nullptr)
 	{
 		// 왼쪽 끝을 넘어갔다면
-		if (hCube->pos.x < -4)
+		if (hCube->top[1].x <= -1)
 		{
 			hCube->dx = abs(hCube->dx);
 		}
 
 		// 오른쪽 끝을 넘어갔다면
-		else if (hCube->pos.x > 4)
+		else if (hCube->top[0].x >= 1)
 		{
 			hCube->dx = -abs(hCube->dx);
 		}
@@ -125,5 +133,29 @@ void Obstacles::update()
 			hCube->bot[i].x += hCube->dx;
 		}
 	}
+
+	// 앞뒤 큐브 업데이트
+	else if (vCube != nullptr)
+	{
+		// 일정 거리 이상 앞으로 이동했다면
+		if (vCube->pos.z < vCube->range[0])
+		{
+			vCube->dz = abs(vCube->dz);
+		}
+
+		// 오른쪽 끝을 넘어갔다면
+		else if (vCube->pos.z > vCube->range[1])
+		{
+			vCube->dz = -abs(vCube->dz);
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			vCube->pos.z += vCube->dz;
+			vCube->top[i].z += vCube->dz;
+			vCube->bot[i].z += vCube->dz;
+		}
+	}
+
 	glutPostRedisplay();
 }

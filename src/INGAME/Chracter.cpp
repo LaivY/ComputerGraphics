@@ -424,7 +424,9 @@ void Character::updateSpeed(KeyValue& keyValue)
 	{
 		// 캐릭터 속도 증가
 		if (keyValue.get("chrSpeed") < 0.05)
+		{
 			keyValue.set("chrSpeed", 0.05);
+		}
 	}
 	speed = keyValue.get("chrSpeed");
 }
@@ -479,7 +481,6 @@ void Character::updateTimer(KeyValue& keyValue, Camera& c, std::vector<Obstacles
 			pos.x -= sin(glm::radians(c.xzAngle - 90)) * speed;
 			pos.z += cos(glm::radians(c.xzAngle - 90)) * speed;
 		}
-
 		glutPostRedisplay();
 	}
 
@@ -516,7 +517,7 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 	BOOL isFalling = FALSE;
 	BOOL isCollided = FALSE;
 
-	// 캐릭터 좌우하앞뒤 좌표
+	// 캐릭터 좌우, 상하, 앞뒤 좌표
 	float lx = std::min(hitBox[0].x, hitBox[1].x);
 	float rx = std::max(hitBox[0].x, hitBox[1].x);
 	float ty = std::max(hitBox[0].y, hitBox[4].y);
@@ -579,6 +580,26 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 			center = o.hCube->pos;
 			radius = o.hCube->radius;
 		}
+
+		// 앞뒤큐브 세팅
+		else if (o.vCube != nullptr)
+		{
+			_lx = o.vCube->top[0].x;
+			_rx = o.vCube->top[1].x;
+			_ty = o.vCube->top[0].y;
+			_by = o.vCube->bot[0].y;
+			_fz = o.vCube->top[2].z;
+			_bz = o.vCube->top[0].z;
+			for (int i = 0; i < 4; i++)
+			{
+				top[i] = o.vCube->top[i];
+				bot[i] = o.vCube->bot[i];
+			}
+			center = o.vCube->pos;
+			radius = o.vCube->radius;
+		}
+
+		/* 이제부터 충돌판정 시작 */
 
 		// 윗면과 충돌했다면
 		for (int i = 0; i < 8; i++)
