@@ -1,6 +1,6 @@
 #pragma once
 #include "FRAMEWORK/openGL.h"
-
+#include <algorithm>
 // ESSENTIAL
 GLvoid drawScene();
 GLvoid reShape(int w, int h);
@@ -9,12 +9,10 @@ GLvoid reShape(int w, int h);
 void motion(int x, int y);
 void keyboard(unsigned char key, int x, int y);
 void keyboardUp(unsigned char key, int x, int y);
+void updateChrPosTimer(int unused);
 void updateChrHpTimer(int unused);
 void updateItemTimer(int unused);
-void updateHObsTimer(int unused);
-void updateH2ObsTimer(int unused);
-void updateVObsTimer(int unused);
-void updateV2ObsTimer(int unused);
+void updateObsTimer(int unused);
 
 // INI FUNC
 void iniUniformData(GLuint pid);

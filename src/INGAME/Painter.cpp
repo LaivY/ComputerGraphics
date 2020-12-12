@@ -83,19 +83,19 @@ void drawLand(Shader& s, Character& chr)
 		0.2, 0.2, 0.2,
 		0.2, 0.2, 0.2,
 
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
 
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
 	};
 
 	std::vector<glm::vec3> pos, rgb;
@@ -112,7 +112,7 @@ void drawLand(Shader& s, Character& chr)
 
 	glUseProgram(s.pid);
 
-	glm::mat4 s0 = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 50));
+	glm::mat4 s0 = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.1, 50));
 	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, chr.getPos().z));
 	GLuint model_matrix_location = glGetUniformLocation(s.pid, "model");
 	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(t0 * s0));
@@ -130,28 +130,7 @@ void drawMap(Shader& s, Camera& c, std::vector<Obstacles>& obs, std::vector<Item
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
-		if (i.cube != nullptr)
-			i.cube->draw(s);
-	}
-	for (auto& i : obs)
-	{
-		if (i.mcube != nullptr)
-			i.mcube->draw(s);
-	}
-	for (auto& i : obs)
-	{
-		if (i.hcube != nullptr)
-			i.hcube->draw(s);
-	}
-	for (auto& i : obs)
-	{
-		if (i.h2cube != nullptr)
-			i.h2cube->draw(s);
-	}
-	for (auto& i : obs)
-	{
-		if (i.vcube != nullptr)
-			i.vcube->draw(s);
+		i.draw(s);
 	}
 	for (auto& i : item)
 	{
@@ -170,28 +149,7 @@ void drawMiniMab(Shader& s, Camera& c, std::vector<Obstacles>& obs, std::vector<
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
-		if (i.cube != nullptr)
-			i.cube->draw(s);
-	}
-	for (auto& i : obs)
-	{
-		if (i.mcube != nullptr)
-			i.mcube->draw(s);
-	}
-	for (auto& i : obs)
-	{
-		if (i.hcube != nullptr)
-			i.hcube->draw(s);
-	}
-	for (auto& i : obs)
-	{
-		if (i.h2cube != nullptr)
-			i.h2cube->draw(s);
-	}
-	for (auto& i : obs)
-	{
-		if (i.vcube != nullptr)
-			i.vcube->draw(s);
+		i.draw(s);
 	}
 	for (auto& i : item)
 	{
