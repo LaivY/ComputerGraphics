@@ -5,8 +5,8 @@
 class Heal
 {
 public:
-	// 위치, 반지름
-	glm::vec3 pos; float radius;
+	// 위치
+	glm::vec3 pos;
 
 	// 왼쪽위, 오른쪽위, 왼쪽아래, 오른쪽아래 순서
 	glm::vec3 top[4], bot[4];
@@ -14,19 +14,19 @@ public:
 	// 회전 각도
 	float angle = 0;
 
-	Heal(glm::vec3 p, float r)
+	Heal(glm::vec3 p)
 	{
-		pos = p; radius = r;
+		pos = p;
 
-		top[0] = { p.x - r, p.y + r, p.z - r };
-		top[1] = { p.x + r, p.y + r, p.z - r };
-		top[2] = { p.x - r, p.y + r, p.z + r };
-		top[3] = { p.x + r, p.y + r, p.z + r };
+		top[0] = { p.x - 0.05, p.y + 0.05, p.z - 0.05 };
+		top[1] = { p.x + 0.05, p.y + 0.05, p.z - 0.05 };
+		top[2] = { p.x - 0.05, p.y + 0.05, p.z + 0.05 };
+		top[3] = { p.x + 0.05, p.y + 0.05, p.z + 0.05 };
 
-		bot[0] = { p.x - r, p.y - r, p.z - r };
-		bot[1] = { p.x + r, p.y - r, p.z - r };
-		bot[2] = { p.x - r, p.y - r, p.z + r };
-		bot[3] = { p.x + r, p.y - r, p.z + r };
+		bot[0] = { p.x - 0.05, p.y - 0.05, p.z - 0.05 };
+		bot[1] = { p.x + 0.05, p.y - 0.05, p.z - 0.05 };
+		bot[2] = { p.x - 0.05, p.y - 0.05, p.z + 0.05 };
+		bot[3] = { p.x + 0.05, p.y - 0.05, p.z + 0.05 };
 	}
 
 	void draw(Shader& s);

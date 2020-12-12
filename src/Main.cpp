@@ -9,7 +9,7 @@
 #include "Main.h"
 
 // GLOBAL
-KeyValue keyvalue;
+KeyValue keyValue;
 Shader s, _s; Camera c, _c; Character chr;
 std::vector<Obstacles> obs; std::vector<Item> item;
 
@@ -37,6 +37,7 @@ void main(int argc, char** argv)
 	glutMotionFunc(motion);
 
 	/* 타이머 함수 설정 */
+	updateChrPosTimer(NULL);
 	updateChrHpTimer(NULL);
 	updateItemTimer(NULL);
 
@@ -47,7 +48,7 @@ void main(int argc, char** argv)
 
 GLvoid drawScene()
 {
-	glClearColor(keyvalue.get("Red"), keyvalue.get("Green"), keyvalue.get("Blue"), 1.0);
+	glClearColor(keyValue.get("Red"), keyValue.get("Green"), keyValue.get("Blue"), 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// 맵
@@ -78,8 +79,6 @@ GLvoid reShape(int w, int h)
 void keyboard(unsigned char key, int x, int y)
 {
 	chr.keyBoardEvent(c, obs, item, key, x, y);
-	chr.update(keyvalue);
-
 	glutPostRedisplay();
 }
 
@@ -96,14 +95,16 @@ void motion(int x, int y)
 	glutPostRedisplay();
 }
 
+void updateChrPosTimer(int unused)
+{
+	chr.updateTimer(keyValue, c, obs, item);
+	glutTimerFunc(30, updateChrPosTimer, NULL);
+}
+
 void updateChrHpTimer(int unused)
 {
-	int hp = chr.getHp();
-	if (hp > 0)
-		chr.setHp(std::max(hp - 1, 0));
-
-	glutPostRedisplay();
-	glutTimerFunc(keyvalue.get("chrHpUpdateInterval"), updateChrHpTimer, NULL);
+	chr.updateHP();
+	glutTimerFunc(keyValue.get("chrHpUpdateInterval"), updateChrHpTimer, NULL);
 }
 
 void updateItemTimer(int unused)
@@ -163,30 +164,30 @@ void iniUniformData2(GLuint pid)
 void iniKeyValues()
 {
 	// 배경색
-	keyvalue.set("Red", 0);
-	keyvalue.set("Blue", 0);
-	keyvalue.set("Green", 0);
+	keyValue.set("Red", 0);
+	keyValue.set("Blue", 0);
+	keyValue.set("Green", 0);
 
 	// 캐릭터 속도
-	keyvalue.set("chrSpeed", 0.01);
+	keyValue.set("chrSpeed", 0.05);
 
 	// 캐릭터 HP 깎이는 간격
-	keyvalue.set("chrHpUpdateInterval", 1000);
+	keyValue.set("chrHpUpdateInterval", 1000);
 }
 
 void debug()
 {
 	for (int i = 0; i < 10; i++)
 	{
-		glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.2, 1 };
+		glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.45, -2 };
 		Obstacles temp(Cube(pos, 0.1));
 		obs.push_back(temp);
 	}
 
 	for (int i = 0; i < 10; i++)
 	{
-		glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.2, -1 };
-		Item temp(Heal(pos, 0.05));
-		item.push_back(temp);
+		glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.3, -1 };
+		Item a = Heal(pos);
+		item.push_back(a);
 	}
 }

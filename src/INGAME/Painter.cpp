@@ -83,19 +83,19 @@ void drawLand(Shader& s, Character& chr)
 		0.2, 0.2, 0.2,
 		0.2, 0.2, 0.2,
 
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
 
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
-		0.2, 0.2, 0.2,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
+		0.1, 0.1, 0.1,
 	};
 
 	std::vector<glm::vec3> pos, rgb;
@@ -112,7 +112,7 @@ void drawLand(Shader& s, Character& chr)
 
 	glUseProgram(s.pid);
 
-	glm::mat4 s0 = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.01, 50));
+	glm::mat4 s0 = glm::scale(glm::mat4(1.0f), glm::vec3(1, 0.1, 50));
 	glm::mat4 t0 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, chr.getPos().z));
 	GLuint model_matrix_location = glGetUniformLocation(s.pid, "model");
 	glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(t0 * s0));
