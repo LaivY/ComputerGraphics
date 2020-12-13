@@ -130,11 +130,20 @@ void drawMap(Shader& s, Camera& c, std::vector<Obstacles>& obs, std::vector<Item
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
+		// 캐릭터와 멀리 떨어져 있는 것은 그리지않는다.
+		float z;
+		if (i.cube != nullptr) z = i.cube->pos.z;
+		else if (i.hCube != nullptr) z = i.hCube->pos.z;
+		else if (i.vCube != nullptr) z = i.vCube->pos.z;
+		if (abs(chr.getPos().z - z) > 20)
+			continue;
+
 		i.draw(s);
 	}
 	for (auto& i : item)
 	{
-		if (i.heal != nullptr)
+		if (i.heal != nullptr &&
+			abs(chr.getPos().z - i.heal->pos.z) <= 20 )
 			i.heal->draw(s);
 	}
 }
@@ -149,11 +158,19 @@ void drawMiniMab(Shader& s, Camera& c, std::vector<Obstacles>& obs, std::vector<
 	chr.draw(s, c);
 	for (auto& i : obs)
 	{
+		float z;
+		if (i.cube != nullptr) z = i.cube->pos.z;
+		else if (i.hCube != nullptr) z = i.hCube->pos.z;
+		else if (i.vCube != nullptr) z = i.vCube->pos.z;
+		if (abs(chr.getPos().z - z) > 20)
+			continue;
+
 		i.draw(s);
 	}
 	for (auto& i : item)
 	{
-		if (i.heal != nullptr)
+		if (i.heal != nullptr &&
+			abs(chr.getPos().z - i.heal->pos.z) <= 20)
 			i.heal->draw(s);
 	}
 }

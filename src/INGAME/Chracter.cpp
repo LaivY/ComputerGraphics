@@ -322,7 +322,7 @@ void Character::keyBoardEvent(Camera& c, std::vector<Obstacles>& obs, std::vecto
 	}
 	else if (key == ' ' && !dy)
 	{
-		dy = 0.09;
+		dy = 0.08;
 	}
 }
 
@@ -419,13 +419,26 @@ void Character::updateHitBox()
 
 void Character::updateSpeed(KeyValue& keyValue)
 {
-	// 캐릭터 위치에 따라 값 변경
-	if (-2 <= pos.z && pos.z < -1)
+	// 캐릭터 위치에 따른 HP 감소 속도 증가
+	int z = abs(pos.z);
+	if (z != 0 && z % 20 == 0)
 	{
-		// 캐릭터 속도 증가
-		if (keyValue.get("chrSpeed") < 0.05)
-			keyValue.set("chrSpeed", 0.05);
+		if (keyValue.get("chrHpUpdateInterval") > 1000 - (z / 20 * 50))
+		{
+			keyValue.set("chrHpUpdateInterval", 1000 - (z / 20 * 50));
+		}
 	}
+
+	// 캐릭터 위치에 따라 값 변경
+	//if (-2 <= pos.z && pos.z < -1)
+	//{
+	//	// 캐릭터 속도 증가
+	//	if (keyValue.get("chrSpeed") < 0.05)
+	//	{
+	//		//keyValue.set("chrSpeed", 0.05);
+	//	}
+	//}
+
 	speed = keyValue.get("chrSpeed");
 }
 
@@ -479,14 +492,13 @@ void Character::updateTimer(KeyValue& keyValue, Camera& c, std::vector<Obstacles
 			pos.x -= sin(glm::radians(c.xzAngle - 90)) * speed;
 			pos.z += cos(glm::radians(c.xzAngle - 90)) * speed;
 		}
-
 		glutPostRedisplay();
 	}
 
 	// 게임 오버
 	if (isGameOver())
 	{
-		int grade = -pos.z * 10;
+		int grade = std::max(-pos.z * 10, 0.0f);
 		std::cout << "점수 : " << grade << std::endl;
 
 		dir = FRONT;
@@ -494,6 +506,10 @@ void Character::updateTimer(KeyValue& keyValue, Camera& c, std::vector<Obstacles
 		angle = 0, aAngle = 0, lAngle = 0, rAngle = 0;
 
 		c.xzAngle = 0; c.yAngle = 0;
+
+		keyValue.clear();
+		obs.clear();
+		item.clear();
 	}
 }
 
@@ -516,7 +532,7 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 	BOOL isFalling = FALSE;
 	BOOL isCollided = FALSE;
 
-	// 캐릭터 좌우하앞뒤 좌표
+	// 캐릭터 좌우, 상하, 앞뒤 좌표
 	float lx = std::min(hitBox[0].x, hitBox[1].x);
 	float rx = std::max(hitBox[0].x, hitBox[1].x);
 	float ty = std::max(hitBox[0].y, hitBox[4].y);
@@ -578,13 +594,36 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 			}
 			center = o.hCube->pos;
 			radius = o.hCube->radius;
+			knockBackDistance += abs(o.hCube->dx);
 		}
+
+		// 앞뒤큐브 세팅
+		else if (o.vCube != nullptr)
+		{
+			_lx = o.vCube->top[0].x;
+			_rx = o.vCube->top[1].x;
+			_ty = o.vCube->top[0].y;
+			_by = o.vCube->bot[0].y;
+			_fz = o.vCube->top[2].z;
+			_bz = o.vCube->top[0].z;
+			for (int i = 0; i < 4; i++)
+			{
+				top[i] = o.vCube->top[i];
+				bot[i] = o.vCube->bot[i];
+			}
+			center = o.vCube->pos;
+			radius = o.vCube->radius;
+
+			knockBackDistance += o.vCube->dz;
+		}
+
+		/* 이제부터 충돌판정 시작 */
 
 		// 윗면과 충돌했다면
 		for (int i = 0; i < 8; i++)
 		{
 			if (_lx < hitBox[i].x && hitBox[i].x < _rx &&
-				_ty <= by && by < _ty + 0.03 &&
+				_ty - 0.03 <= by && by < _ty + 0.03 &&
 				_bz < hitBox[i].z && hitBox[i].z < _fz)
 			{
 				dy = 0;

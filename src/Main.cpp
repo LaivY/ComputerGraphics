@@ -5,6 +5,7 @@
 #include "INGAME/Obstacle.h"
 #include "INGAME/Item.h"
 #include "INGAME/Painter.h"
+#include "INGAME/Generator.h"
 #include "keyValues.h"
 #include "Main.h"
 
@@ -13,7 +14,7 @@ KeyValue keyValue;
 Shader s, _s; Camera c, _c; Character chr;
 std::vector<Obstacles> obs; std::vector<Item> item;
 
-void debug();
+void printInstructions();
 void main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
@@ -29,18 +30,21 @@ void main(int argc, char** argv)
 	iniUniformData2(_s.pid);
 	iniKeyValues();
 
-	debug();
+	/* 게임 설명 */
+	printInstructions();
 
 	/* 콜백 함수 설정 */
 	glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyboardUp);
 	glutMotionFunc(motion);
+	glutMouseWheelFunc(wheel);
 
 	/* 타이머 함수 설정 */
 	updateChrPosTimer(NULL);
 	updateChrHpTimer(NULL);
 	updateItemTimer(NULL);
 	updateObsTimer(NULL);
+	updateGenTimer(NULL);
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(reShape);
@@ -52,23 +56,23 @@ GLvoid drawScene()
 	glClearColor(keyValue.get("Red"), keyValue.get("Green"), keyValue.get("Blue"), 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// 맵
-	glEnable(GL_DEPTH_TEST);
-	drawMap(s, c, obs, item, chr);
-	glDisable(GL_DEPTH_TEST);
+// 맵
+glEnable(GL_DEPTH_TEST);
+drawMap(s, c, obs, item, chr);
+glDisable(GL_DEPTH_TEST);
 
-	// 미니맵
-	drawMiniMabBGR(_s);
-	glEnable(GL_DEPTH_TEST);
-	drawMiniMab(s, _c, obs, item, chr);
-	glDisable(GL_DEPTH_TEST);
+// 미니맵
+drawMiniMabBGR(_s);
+glEnable(GL_DEPTH_TEST);
+drawMiniMab(s, _c, obs, item, chr);
+glDisable(GL_DEPTH_TEST);
 
-	// UI
-	drawHPBar(_s, chr.getHp());
-	drawMiniMabEdge(_s);
-	drawHPBarEdge(_s);
+// UI
+drawHPBar(_s, chr.getHp());
+drawMiniMabEdge(_s);
+drawHPBarEdge(_s);
 
-	glutSwapBuffers();
+glutSwapBuffers();
 }
 
 GLvoid reShape(int w, int h)
@@ -77,6 +81,13 @@ GLvoid reShape(int w, int h)
 }
 
 // CALLBACK
+void motion(int x, int y)
+{
+	chr.mouseMotionEvent(c, x, y);
+	chr.setCameraViewMatrix(c, s.pid);
+	glutPostRedisplay();
+}
+
 void keyboard(unsigned char key, int x, int y)
 {
 	chr.keyBoardEvent(c, obs, item, key, x, y);
@@ -89,11 +100,21 @@ void keyboardUp(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-void motion(int x, int y)
+void wheel(int wheel, int direction, int x, int y)
 {
-	chr.mouseMotionEvent(c, x, y);
-	chr.setCameraViewMatrix(c, s.pid);
-	glutPostRedisplay();
+	// 확대
+	if (direction == 1)
+	{
+		c.radius -= 0.05;
+		c.radius = std::max(0.3f, c.radius);
+	}
+
+	// 축소
+	else if (direction == -1)
+	{
+		c.radius += 0.05;
+		c.radius = std::min(1.0f, c.radius);
+	}
 }
 
 void updateChrPosTimer(int unused)
@@ -110,7 +131,10 @@ void updateChrHpTimer(int unused)
 
 void updateItemTimer(int unused)
 {
-	updateItems(item);
+	for (auto& i : item)
+	{
+		i.update();
+	}
 	glutPostRedisplay();
 	glutTimerFunc(50, updateItemTimer, NULL);
 }
@@ -122,6 +146,27 @@ void updateObsTimer(int unused)
 		o.update();
 	}
 	glutTimerFunc(30, updateObsTimer, NULL);
+}
+
+void updateGenTimer(int unused)
+{
+	int z = -chr.getPos().z;
+
+	if (z % 10 == 0)
+	{
+		if (keyValue.get("chr" + std::to_string(z)) != 1)
+		{
+			genStructure(obs, item, -z - 10);
+			keyValue.set("chr" + std::to_string(z), 1);
+		}
+
+		if (keyValue.get("chr" + std::to_string(z + 10)) != 1)
+		{
+			genStructure(obs, item, -z - 20);
+			keyValue.set("chr" + std::to_string(z + 10), 1);
+		}
+	}
+	glutTimerFunc(10, updateGenTimer, NULL);
 }
 
 // INI
@@ -185,508 +230,18 @@ void iniKeyValues()
 	keyValue.set("chrHpUpdateInterval", 1000);
 }
 
-//2.0 거리
-void cross_maze(float z)
+void printInstructions()
 {
-	//파란 교차 구간
-	{
-		//앞줄
-		{
-			Obstacles temp3(Cube(glm::vec3(0.4, 0.5, z), 0.5));
-			obs.push_back(temp3);
-		}
-		{
-			Obstacles temp3(Cube(glm::vec3(0.0, 0.5, z), 0.5));
-			obs.push_back(temp3);
-		}
-
-
-
-
-		{
-			Obstacles temp3(Cube(glm::vec3(-0.8, 0.5, z - 1.4), 0.5));
-			obs.push_back(temp3);
-		}
-	
-		{
-			Obstacles temp3(Cube(glm::vec3(0.8, 0.5, z - 1.4), 0.5));
-			obs.push_back(temp3);
-		}
-	
-
-	
-
-
-	}
-
-}
-
-//2.6 거리
-void way_3(float z)
-{
-
-	//왼쪽
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.4, 0.2, z), 0.2));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(-0.4, 0.2, z - 0.2), 0.2));
-		obs.push_back(temp);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(-0.4, 0.2, z - 0.6), 0.2));
-		obs.push_back(temp);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(-0.4, 0.2, z - 1.0), 0.2));
-		obs.push_back(temp);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(-0.4, 0.2, z - 1.4), 0.2));
-		obs.push_back(temp);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(-0.4, 0.2, z - 1.8), 0.2));
-		obs.push_back(temp);
-	}
-
-	//오른쪽
-	{
-		Obstacles temp3(Cube(glm::vec3(0.4, 0.2, z), 0.2));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(0.4, 0.2, z - 0.2), 0.2));
-		obs.push_back(temp);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(0.4, 0.2, z - 0.6), 0.2));
-		obs.push_back(temp);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(0.4, 0.2, z - 1.0), 0.2));
-		obs.push_back(temp);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(0.4, 0.2, z - 1.4), 0.2));
-		obs.push_back(temp);
-	}
-	{
-		Obstacles temp(Cube(glm::vec3(0.4, 0.2, z - 1.8), 0.2));
-		obs.push_back(temp);
-	}
-
-	//3차로 끝나는 지점
-	{
-		{
-			Obstacles temp3(HCube(glm::vec3(0, 0.2, z - 2.2), 0.2,0.01));
-			obs.push_back(temp3);
-		}
-
-	}
-
-
-}
-
-
-void side_maze(float z)
-{
-
-
-	{
-		Obstacles temp3(Cube(glm::vec3(0.6, 0.4, z), 0.4));
-		obs.push_back(temp3);
-	}
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.6, 0.4, z), 0.4));
-		obs.push_back(temp3);
-	}
-
-
-	{
-		Obstacles temp3(Cube(glm::vec3(0.6, 0.4, z-1.1), 0.4));
-		obs.push_back(temp3);
-	}
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.6, 0.4, z-1.1), 0.4));
-		obs.push_back(temp3);
-	}
-
-	Item a = Heal(glm::vec3(-0.8, 0.3, z - 1.65));
-	item.push_back(a);
-
-
-	{
-		Obstacles temp3(Cube(glm::vec3(0.6, 0.4, z - 2.2), 0.4));
-		obs.push_back(temp3);
-	}
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.6, 0.4, z - 2.2), 0.4));
-		obs.push_back(temp3);
-	}
-
-
-
-	////상하
-	//{
-	//	Obstacles temp4(VCube(glm::vec3(0.0, 0.1, z - 2.0), 0.2));
-	//	obs.push_back(temp4);
-	//}
-
-	//아이템
-
-
-
-
-
-
-
-
-
-
-
-}
-void zige(float z)
-{
-	{
-		Obstacles temp(Cube(glm::vec3(-0.0, 0.1, z), 0.2));
-		obs.push_back(temp);
-	}
-
-	{
-		{
-			Obstacles temp(Cube(glm::vec3(-0.4, 0.1, z - 0.4), 0.2));
-			obs.push_back(temp);
-		}
-
-		{
-			Obstacles temp(Cube(glm::vec3(0.8, 0.1, z - 0.4), 0.2));
-			obs.push_back(temp);
-		}
-	}
-
-	{
-		{
-			Obstacles temp(Cube(glm::vec3(-0.8, 0.1, z - 0.8), 0.2));
-			obs.push_back(temp);
-		}
-		{
-			Obstacles temp(Cube(glm::vec3(0.4, 0.1, z - 0.8), 0.2));
-			obs.push_back(temp);
-		}
-	}
-
-	{
-		{
-			Obstacles temp(Cube(glm::vec3(-0.0, 0.1, z - 1.2), 0.2));
-			obs.push_back(temp);
-		}
-	}
-
-	{
-
-		{
-			Obstacles temp(Cube(glm::vec3(-0.4, 0.1, z - 1.6), 0.2));
-			obs.push_back(temp);
-		}
-
-	}
-	
-	Item a = Heal(glm::vec3(-0.8, 0.3, z - 1.6));
-	item.push_back(a);
-
-
-	{
-		{
-			Obstacles temp(Cube(glm::vec3(-0.0, 0.1, z - 2.0), 0.2));
-			obs.push_back(temp);
-		}
-
-	}
-
-	{
-		{
-			Obstacles temp(Cube(glm::vec3(-0.8, 0.1, z - 2.4), 0.2));
-			obs.push_back(temp);
-		}
-		{
-			Obstacles temp(Cube(glm::vec3(0.4, 0.1, z - 2.4), 0.2));
-			obs.push_back(temp);
-		}
-	}
-
-	{
-		{
-			Obstacles temp(Cube(glm::vec3(-0.4, 0.1, z - 2.8), 0.2));
-			obs.push_back(temp);
-		}
-		{
-			Obstacles temp(Cube(glm::vec3(0.8, 0.1, z - 2.8), 0.2));
-			obs.push_back(temp);
-		}
-	}
-
-	{
-		{
-			Obstacles temp(Cube(glm::vec3(-0.0, 0.1, z - 3.2), 0.2));
-			obs.push_back(temp);
-		}
-	}
-
-
-	
-}
-void hzone(float z)
-{
-	{
-		Obstacles temp2(HCube(glm::vec3(-0.0, 0.2, z), 0.2,0.03));
-		obs.push_back(temp2);
-	}
-
-	{
-		Obstacles temp5(HCube(glm::vec3(0.0, 0.2, z - 0.4), 0.2, -0.03));
-		obs.push_back(temp5);
-	}
-	{
-		Obstacles temp2(HCube(glm::vec3(-0.0, 0.2, z - 0.8), 0.2, 0.03));
-		obs.push_back(temp2);
-	}
-
-	{
-		Obstacles temp5(HCube(glm::vec3(0.0, 0.2, z - 1.2), 0.2, -0.03));
-		obs.push_back(temp5);
-	}
-
-
-
-}
-
-void jump_1(float z)
-{
-
-	
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.8, 0.4, z-1.0), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.4, 0.4, z- 1.0), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.0, 0.4, z- 1.0), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.4, 0.4, z- 1.0), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.8, 0.4, z- 1.0), 0.4));
-		obs.push_back(temp3);
-	}
-
-
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.4, 0.8, z - 2.2), 0.6));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.0, 0.8, z - 2.2), 0.6));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.4, 0.8, z - 2.2), 0.6));
-		obs.push_back(temp3);
-	}
-
-	
-	Item a = Heal(glm::vec3(-0.8, 1.0, z - 3.2));
-	item.push_back(a);
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.8, 0.4, z - 3.0), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.4, 0.4, z - 3.0), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.0, 0.4, z - 3.0), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.4, 0.4, z - 3.0), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.8, 0.4, z - 3.0), 0.4));
-		obs.push_back(temp3);
-	}
-	
-
-
-}
-
-void jump_2(float z)
-{
-
-
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.8, 0.4, z ), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.4, 0.4, z ), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.0, 0.4, z ), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.4, 0.4, z ), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.8, 0.4, z ), 0.4));
-		obs.push_back(temp3);
-	}
-
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.8, 0.4, z - 2.4), 0.4));
-		obs.push_back(temp3);
-	}
-	
-	{
-		Obstacles temp3(Cube(glm::vec3(0.0, 0.8, z - 2.4), 0.8));
-		obs.push_back(temp3);
-	}
-
-
-	Item a = Heal(glm::vec3(-0.9, 0.3, z - 3.2));
-	item.push_back(a);
-
-
-
-
-
-}
-
-void jump_3(float z)
-{
-
-	{
-		Obstacles temp3(HCube(glm::vec3(-0.8, 0.2, z), 0.2,0.03));
-		obs.push_back(temp3);
-	}
-
-
-
-
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.55, 0.4, z-0.8), 0.4));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.0, 0.3, z - 0.8), 0.3));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.55, 0.4, z - 0.8), 0.4));
-		obs.push_back(temp3);
-	}
-
-	{
-		Obstacles temp3(Cube(glm::vec3(-0.2, 0.4, z - 2.2), 0.6));
-		obs.push_back(temp3);
-	}
-	{
-		Obstacles temp3(Cube(glm::vec3(0.2, 0.4, z - 2.2), 0.6));
-		obs.push_back(temp3);
-	}
-
-	Item a = Heal(glm::vec3(-0.0, 0.3, z - 1.4));
-	item.push_back(a);
-
-
-
-
-
-}
-
-
-void debug()
-{
-
-
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.3, -1 };
-	//	Item a = Heal(pos);
-	//	item.push_back(a);
-	//}
-
-
-	float z = -1;
-	int pattern = 0;
-	for (int i = 0;i < 10;i++)
-	{
-		pattern = rand() % 17;
-		printf("%d\n",pattern);
-		if (pattern == 0 || pattern == 1|| pattern == 2)
-		{
-			hzone(z);
-		}
-		else if (pattern == 3 || pattern == 4|| pattern == 5)
-		{
-			way_3(z);
-		}
-		else if (pattern == 6 || pattern == 7|| pattern == 8)
-		{
-			side_maze(z);
-		}
-		else if (pattern == 9|| pattern == 10|| pattern == 11)
-		{
-			cross_maze(z);
-		}
-		else if (pattern == 12|| pattern == 13|| pattern == 14)
-		{
-			zige(z);
-		}
-		else if (pattern == 15)
-		{
-			jump_1(z);
-		}
-		else if (pattern == 16)
-		{
-			jump_2(z);
-		}
-		else if (pattern == 17)
-		{
-			jump_3(z);
-		}
-
-
-
-
-
-		z -= 5;
-
-		("%d\n", pattern);
-	}
-
-
-
-	glm::vec3 t = { 1, 2, 3 };
+	std::cout << std::endl;
+	std::cout << "┌───────────── ^ㅡ^팀 프로젝트─────────────┐" << std::endl;
+	std::cout << "│ WASD\t\t: 이동                     │" << std::endl;
+	std::cout << "│ 스페이스바\t: 점프                     │" << std::endl;
+	std::cout << "│ 마우스 드래그\t: 카메라 방향 전환         │" << std::endl;
+	std::cout << "│ 마우스 휠\t: 확대, 축소               │" << std::endl;
+	std::cout << "├──────────────────────────────────────────┤" << std::endl;
+	std::cout << "│ 캐릭터의 체력은 계속해서 소모되며,       │" << std::endl;
+	std::cout << "│ 캐릭터가 나아갈수록 더 빨리 소모됩니다   │" << std::endl;
+	std::cout << "│ 아이템을 획득해 체력을 회복할 수 있습니다│" << std::endl;
+	std::cout << "│ 장애물들을 뚫고 최대한 앞으로 가봅시다!  │" << std::endl;
+	std::cout << "└──────────────────────────────────────────┘" << std::endl;
 }

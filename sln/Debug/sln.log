@@ -1,0 +1,46 @@
+﻿  Generator.cpp
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(6,48): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(9,55): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(10,54): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(11,58): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(27,34): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(28,36): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(33,35): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(34,37): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(44,59): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(53,34): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(56,35): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(71,16): warning C4305: '+=': 'double'에서 'T'(으)로 잘립니다.
+          with
+          [
+              T=float
+          ]
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(89,58): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(90,77): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(91,76): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(92,77): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(93,76): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(94,64): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(95,77): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(97,64): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(98,77): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(99,76): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(100,77): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(101,76): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(102,64): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(130,12): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(131,35): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(132,37): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(144,30): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(145,32): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(153,30): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(166,30): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(173,31): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(183,57): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(185,56): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(186,56): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(187,57): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(188,55): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(190,56): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\src\INGAME\Generator.cpp(191,55): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+  sln.vcxproj -> C:\Users\cksnd\Desktop\CG_TEAM_PROJECT\sln\Debug\sln.exe
