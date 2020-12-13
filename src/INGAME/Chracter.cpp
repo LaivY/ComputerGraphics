@@ -382,15 +382,15 @@ void Character::updateHP()
 
 void Character::updateHitBox()
 {
-	hitBox[0] = { -0.10, 0.09, -0.05 };
-	hitBox[1] = {  0.10, 0.09, -0.05 };
-	hitBox[2] = { -0.10, 0.09,  0.05 };
-	hitBox[3] = {  0.10, 0.09,  0.05 };
+	hitBox[0] = { -0.08, 0.09, -0.05 };
+	hitBox[1] = {  0.08, 0.09, -0.05 };
+	hitBox[2] = { -0.08, 0.09,  0.05 };
+	hitBox[3] = {  0.08, 0.09,  0.05 };
 
-	hitBox[4] = { -0.10, -0.18, -0.05 };
-	hitBox[5] = {  0.10, -0.18, -0.05 };
-	hitBox[6] = { -0.10, -0.18,  0.05 };
-	hitBox[7] = {  0.10, -0.18,  0.05 };
+	hitBox[4] = { -0.08, -0.18, -0.05 };
+	hitBox[5] = {  0.08, -0.18, -0.05 };
+	hitBox[6] = { -0.08, -0.18,  0.05 };
+	hitBox[7] = {  0.08, -0.18,  0.05 };
 
 	GLfloat CHR_GLOBAL_ROTATION_ANGLE = 0;
 	switch (dir)
@@ -423,21 +423,18 @@ void Character::updateSpeed(KeyValue& keyValue)
 	int z = abs(pos.z);
 	if (z != 0 && z % 20 == 0)
 	{
-		if (keyValue.get("chrHpUpdateInterval") > 1000 - (z / 20 * 50))
+		float interval = keyValue.get("chrHpUpdateInterval");
+		if (interval > 1000 - (z / 20 * 100))
 		{
-			keyValue.set("chrHpUpdateInterval", 1000 - (z / 20 * 50));
+			keyValue.set("chrHpUpdateInterval", std::max(500, 1000 - (z / 20 * 100)));
+		}
+
+		float speed = keyValue.get("chrSpeed");
+		if (speed < 0.05 + (z / 20.0 / 200.0))
+		{
+			keyValue.set("chrSpeed", std::min(0.1, 0.05 + (z / 20.0 / 200.0)));
 		}
 	}
-
-	// 캐릭터 위치에 따라 값 변경
-	//if (-2 <= pos.z && pos.z < -1)
-	//{
-	//	// 캐릭터 속도 증가
-	//	if (keyValue.get("chrSpeed") < 0.05)
-	//	{
-	//		//keyValue.set("chrSpeed", 0.05);
-	//	}
-	//}
 
 	speed = keyValue.get("chrSpeed");
 }
@@ -550,7 +547,8 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 		isFalling = TRUE;
 
 	// 장애물
-	float knockBackDistance = 0.025;
+	float knockBackDistanceX = 0.025;
+	float knockBackDistanceZ = 0.025;
 	for (auto& o : obs)
 	{
 		// 충돌 체크에 사용할 변수 선언
@@ -594,7 +592,7 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 			}
 			center = o.hCube->pos;
 			radius = o.hCube->radius;
-			knockBackDistance += abs(o.hCube->dx);
+			knockBackDistanceX += abs(o.hCube->dx);
 		}
 
 		// 앞뒤큐브 세팅
@@ -614,7 +612,7 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 			center = o.vCube->pos;
 			radius = o.vCube->radius;
 
-			knockBackDistance += o.vCube->dz;
+			knockBackDistanceZ += o.vCube->dz;
 		}
 
 		/* 이제부터 충돌판정 시작 */
@@ -642,32 +640,32 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 				// 앞면과 충돌했다면
 				if (pos.z > _fz)
 				{
-					pos.z += knockBackDistance;
+					pos.z += knockBackDistanceZ;
 					isCollided = TRUE;
 				}
 				// 왼쪽과 충돌했다면
 				else if (pos.x < _lx)
 				{
-					pos.x -= knockBackDistance;
+					pos.x -= knockBackDistanceX;
 					isCollided = TRUE;
 				}
 				// 오른쪽과 충돌했다면
 				else if (pos.x > _rx)
 				{
-					pos.x += knockBackDistance;
+					pos.x += knockBackDistanceX;
 					isCollided = TRUE;
 				}
 				// 뒷면과 충돌했다면
 				else if (pos.z < _bz)
 				{
-					pos.z -= knockBackDistance;
+					pos.z -= knockBackDistanceZ;
 					isCollided = TRUE;
 				}
 				// 대각선 충돌
 				else
 				{
-					pos.x += knockBackDistance * sin(glm::radians(rAngle + 180));
-					pos.z -= knockBackDistance * cos(glm::radians(rAngle + 180));
+					pos.x += knockBackDistanceX * sin(glm::radians(rAngle + 180));
+					pos.z -= knockBackDistanceZ * cos(glm::radians(rAngle + 180));
 					isCollided = TRUE;
 				}
 
@@ -683,8 +681,8 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 				by < top[i].y && top[i].y < ty &&
 				bz < top[i].z && top[i].z < fz)
 			{
-				pos.x += knockBackDistance * sin(glm::radians(rAngle + 180));
-				pos.z -= knockBackDistance * cos(glm::radians(rAngle + 180));
+				pos.x += knockBackDistanceX * sin(glm::radians(rAngle + 180));
+				pos.z -= knockBackDistanceZ * cos(glm::radians(rAngle + 180));
 				isCollided = TRUE;
 			}
 
@@ -692,8 +690,8 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 				by < bot[i].y && bot[i].y < ty &&
 				bz < bot[i].z && bot[i].z < fz)
 			{
-				pos.x += knockBackDistance * sin(glm::radians(rAngle + 180));
-				pos.z -= knockBackDistance * cos(glm::radians(rAngle + 180));
+				pos.x += knockBackDistanceX * sin(glm::radians(rAngle + 180));
+				pos.z -= knockBackDistanceZ * cos(glm::radians(rAngle + 180));
 				isCollided = TRUE;
 			}
 		}
@@ -747,12 +745,13 @@ BOOL Character::isCollided(std::vector<Obstacles>& obs, std::vector<Item>& item)
 	if (isFalling && !isCollided)
 	{
 		dy -= 0.008;
+		dy = std::max(-0.1f, dy);
 		glutPostRedisplay();
 	}
 
 	// 착지
 	for (int i = 0; i < 8; i++)
-		if (-0.05 <= hitBox[i].y - 0.01 && hitBox[i].y - 0.01 < 0.05 && !isFalling)
+		if (-0.07 <= hitBox[i].y - 0.01 && hitBox[i].y - 0.01 < 0.07 && !isFalling && !isCollided)
 		{
 			dy = 0; pos.y = 0.26;
 			break;

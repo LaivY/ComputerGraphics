@@ -14,7 +14,6 @@ KeyValue keyValue;
 Shader s, _s; Camera c, _c; Character chr;
 std::vector<Obstacles> obs; std::vector<Item> item;
 
-void printInstructions();
 void main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
@@ -152,18 +151,18 @@ void updateGenTimer(int unused)
 {
 	int z = -chr.getPos().z;
 
-	if (z % 10 == 0)
+	if (z % 8 == 0)
 	{
 		if (keyValue.get("chr" + std::to_string(z)) != 1)
 		{
-			genStructure(obs, item, -z - 10);
+			genStructure(obs, item, -z - 8);
 			keyValue.set("chr" + std::to_string(z), 1);
 		}
 
-		if (keyValue.get("chr" + std::to_string(z + 10)) != 1)
+		if (keyValue.get("chr" + std::to_string(z + 8)) != 1)
 		{
-			genStructure(obs, item, -z - 20);
-			keyValue.set("chr" + std::to_string(z + 10), 1);
+			genStructure(obs, item, -z - 16);
+			keyValue.set("chr" + std::to_string(z + 8), 1);
 		}
 	}
 	glutTimerFunc(10, updateGenTimer, NULL);
@@ -230,6 +229,7 @@ void iniKeyValues()
 	keyValue.set("chrHpUpdateInterval", 1000);
 }
 
+// ETC
 void printInstructions()
 {
 	std::cout << std::endl;

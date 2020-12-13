@@ -20,3 +20,6 @@ void updateGenTimer(int unused);
 void iniUniformData(GLuint pid);
 void iniUniformData2(GLuint pid);
 void iniKeyValues();
+
+// ETC
+void printInstructions();

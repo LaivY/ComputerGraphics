@@ -121,7 +121,7 @@ void hzone(std::vector<Obstacles>& obs, float z)
 	{
 		glm::vec3 pos = { 0, 0.3, z - 0.4 * i };
 		glm::vec3 _pos = { 0, 0.7, z - 0.4 * i };
-		float dx = i % 2 == 0 ? 0.02 + rand() % 50 / 1000.0 : -0.02 - rand() % 50 / 1000.0;
+		float dx = i % 2 == 0 ? 0.02 + rand() % 25 / 1000.0 : -0.02 - rand() % 25 / 1000.0;
 		Obstacles o = HCube(pos, 0.2, dx);
 		Obstacles _o = HCube(_pos, 0.2, dx);
 		obs.push_back(o);
@@ -135,15 +135,15 @@ void jump_1(std::vector<Obstacles>& obs, std::vector<Item>& item, float z)
 	{
 		glm::vec3 pos = { -0.8 + 0.4 * i, 0.4, z - 1 };
 		glm::vec3 _pos = { -0.8 + 0.4 * i, 0.4, z - 3 };
-		Obstacles o = Cube(pos, 0.4);
-		Obstacles _o = Cube(_pos, 0.4);
+		Obstacles o = Cube(pos, 0.3);
+		Obstacles _o = Cube(_pos, 0.3);
 		obs.push_back(o);
 		obs.push_back(_o);
 	}
 
 	for (int i = 0; i < 3; i++)
 	{
-		glm::vec3 pos = { -0.4 + 0.4 * i, 0.8, z - 2.2 };
+		glm::vec3 pos = { -0.4 + 0.4 * i, 0.6, z - 2.2 };
 		Obstacles o = Cube(pos, 0.6);
 		obs.push_back(o);
 	}
@@ -161,12 +161,12 @@ void jump_2(std::vector<Obstacles>& obs, std::vector<Item>& item, float z)
 		obs.push_back(o);
 	}
 
-	for (int i = 0; i < 2; i++)
-	{
-		glm::vec3 pos = { -0.8 + 0.8 * i, 0.4 + 0.4 * i, z - 2.4 };
-		Obstacles o = Cube(pos, 0.4 + 0.4 * i);
-		obs.push_back(o);
-	}
+	glm::vec3 p0 = { -0.6, 0.4, z - 2.4 };
+	glm::vec3 p1 = { 0, 0.6, z - 2.4 };
+	Obstacles o0 = Cube(p0, 0.4);
+	Obstacles o1 = Cube(p1, 0.6);
+	obs.push_back(o0);
+	obs.push_back(o1);
 
 	Item i = Heal(glm::vec3(-0.9, 0.3, z - 3.2));
 	item.push_back(i);
@@ -180,8 +180,8 @@ void jump_3(std::vector<Obstacles>& obs, std::vector<Item>& item, float z)
 	Obstacles o2 = Cube(glm::vec3(-0.0, 0.3, z - 0.8), 0.3);
 	Obstacles o3 = Cube(glm::vec3(0.55, 0.4, z - 0.8), 0.4);
 
-	Obstacles o4 = Cube(glm::vec3(-0.2, 0.4, z - 2.2), 0.6);
-	Obstacles o5 = Cube(glm::vec3(0.2, 0.4, z - 2.2), 0.6);
+	Obstacles o4 = Cube(glm::vec3(-0.2, 0.6, z - 2.2), 0.6);
+	Obstacles o5 = Cube(glm::vec3(0.2, 0.6, z - 2.2), 0.6);
 
 	obs.push_back(o0);
 	obs.push_back(o1);
