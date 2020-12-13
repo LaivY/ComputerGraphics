@@ -5,6 +5,7 @@
 #include "INGAME/Obstacle.h"
 #include "INGAME/Item.h"
 #include "INGAME/Painter.h"
+#include "INGAME/Generator.h"
 #include "keyValues.h"
 #include "Main.h"
 
@@ -13,7 +14,7 @@ KeyValue keyValue;
 Shader s, _s; Camera c, _c; Character chr;
 std::vector<Obstacles> obs; std::vector<Item> item;
 
-void debug();
+void printInstructions();
 void main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
@@ -29,7 +30,8 @@ void main(int argc, char** argv)
 	iniUniformData2(_s.pid);
 	iniKeyValues();
 
-	debug();
+	/* 게임 설명 */
+	printInstructions();
 
 	/* 콜백 함수 설정 */
 	glutKeyboardFunc(keyboard);
@@ -42,6 +44,7 @@ void main(int argc, char** argv)
 	updateChrHpTimer(NULL);
 	updateItemTimer(NULL);
 	updateObsTimer(NULL);
+	updateGenTimer(NULL);
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(reShape);
@@ -53,23 +56,23 @@ GLvoid drawScene()
 	glClearColor(keyValue.get("Red"), keyValue.get("Green"), keyValue.get("Blue"), 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// 맵
-	glEnable(GL_DEPTH_TEST);
-	drawMap(s, c, obs, item, chr);
-	glDisable(GL_DEPTH_TEST);
+// 맵
+glEnable(GL_DEPTH_TEST);
+drawMap(s, c, obs, item, chr);
+glDisable(GL_DEPTH_TEST);
 
-	// 미니맵
-	drawMiniMabBGR(_s);
-	glEnable(GL_DEPTH_TEST);
-	drawMiniMab(s, _c, obs, item, chr);
-	glDisable(GL_DEPTH_TEST);
+// 미니맵
+drawMiniMabBGR(_s);
+glEnable(GL_DEPTH_TEST);
+drawMiniMab(s, _c, obs, item, chr);
+glDisable(GL_DEPTH_TEST);
 
-	// UI
-	drawHPBar(_s, chr.getHp());
-	drawMiniMabEdge(_s);
-	drawHPBarEdge(_s);
+// UI
+drawHPBar(_s, chr.getHp());
+drawMiniMabEdge(_s);
+drawHPBarEdge(_s);
 
-	glutSwapBuffers();
+glutSwapBuffers();
 }
 
 GLvoid reShape(int w, int h)
@@ -107,7 +110,7 @@ void wheel(int wheel, int direction, int x, int y)
 	}
 
 	// 축소
-	else if(direction == -1)
+	else if (direction == -1)
 	{
 		c.radius += 0.05;
 		c.radius = std::min(1.0f, c.radius);
@@ -143,6 +146,27 @@ void updateObsTimer(int unused)
 		o.update();
 	}
 	glutTimerFunc(30, updateObsTimer, NULL);
+}
+
+void updateGenTimer(int unused)
+{
+	int z = -chr.getPos().z;
+
+	if (z % 10 == 0)
+	{
+		if (keyValue.get("chr" + std::to_string(z)) != 1)
+		{
+			genStructure(obs, item, -z - 10);
+			keyValue.set("chr" + std::to_string(z), 1);
+		}
+
+		if (keyValue.get("chr" + std::to_string(z + 10)) != 1)
+		{
+			genStructure(obs, item, -z - 20);
+			keyValue.set("chr" + std::to_string(z + 10), 1);
+		}
+	}
+	glutTimerFunc(10, updateGenTimer, NULL);
 }
 
 // INI
@@ -200,24 +224,24 @@ void iniKeyValues()
 	keyValue.set("Green", 0);
 
 	// 캐릭터 속도
-	keyValue.set("chrSpeed", 0.02);
+	keyValue.set("chrSpeed", 0.05);
 
 	// 캐릭터 HP 깎이는 간격
 	keyValue.set("chrHpUpdateInterval", 1000);
 }
 
-void debug()
+void printInstructions()
 {
-	{
-		glm::vec3 pos = { 0, 0.3, -0.5 };
-		Obstacles temp(Cube(pos, 0.13));
-		obs.push_back(temp);
-	}
-
-	for (int i = 0; i < 10; i++)
-	{
-		glm::vec3 pos = { rand() % 100 / 100.0 - 0.5, 0.3, -1 };
-		Item a = Heal(pos);
-		item.push_back(a);
-	}
+	std::cout << std::endl;
+	std::cout << "┌───────────── ^ㅡ^팀 프로젝트─────────────┐" << std::endl;
+	std::cout << "│ WASD\t\t: 이동                     │" << std::endl;
+	std::cout << "│ 스페이스바\t: 점프                     │" << std::endl;
+	std::cout << "│ 마우스 드래그\t: 카메라 방향 전환         │" << std::endl;
+	std::cout << "│ 마우스 휠\t: 확대, 축소               │" << std::endl;
+	std::cout << "├──────────────────────────────────────────┤" << std::endl;
+	std::cout << "│ 캐릭터의 체력은 계속해서 소모되며,       │" << std::endl;
+	std::cout << "│ 캐릭터가 나아갈수록 더 빨리 소모됩니다   │" << std::endl;
+	std::cout << "│ 아이템을 획득해 체력을 회복할 수 있습니다│" << std::endl;
+	std::cout << "│ 장애물들을 뚫고 최대한 앞으로 가봅시다!  │" << std::endl;
+	std::cout << "└──────────────────────────────────────────┘" << std::endl;
 }

@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\FRAMEWORK\Shader.cpp" />
     <ClCompile Include="..\src\INGAME\Chracter.cpp" />
+    <ClCompile Include="..\src\INGAME\Generator.cpp" />
     <ClCompile Include="..\src\INGAME\Item.cpp" />
     <ClCompile Include="..\src\INGAME\Obstacle.cpp" />
     <ClCompile Include="..\src\INGAME\Painter.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="..\src\FRAMEWORK\openGL.h" />
     <ClInclude Include="..\src\FRAMEWORK\Shader.h" />
     <ClInclude Include="..\src\INGAME\Chracter.h" />
+    <ClInclude Include="..\src\INGAME\Generator.h" />
     <ClInclude Include="..\src\INGAME\Item.h" />
     <ClInclude Include="..\src\INGAME\Obstacle.h" />
     <ClInclude Include="..\src\INGAME\Painter.h" />

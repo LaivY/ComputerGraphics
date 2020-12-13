@@ -47,8 +47,6 @@ void Shader::loadShaders(std::string vertexShaderFile, std::string fragmentShade
 		glGetShaderInfoLog(vs, 512, NULL, err);
 		std::cerr << "Err : vertex Shader Compile error\n" << err << std::endl;
 	}
-	else
-		std::cout << "Compile Vertex Shader OK." << std::endl;
 
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &result);
 	if (!result)
@@ -56,8 +54,6 @@ void Shader::loadShaders(std::string vertexShaderFile, std::string fragmentShade
 		glGetShaderInfoLog(fs, 512, NULL, err);
 		std::cerr << "Err : fragment Shader Compile error\n" << err << std::endl;
 	}
-	else
-		std::cout << "Compile Fragment Shader OK." << std::endl;
 
 	// ¸µÅ©
 	pid = glCreateProgram();
@@ -73,8 +69,6 @@ void Shader::loadShaders(std::string vertexShaderFile, std::string fragmentShade
 	glGetProgramiv(pid, GL_LINK_STATUS, &result);
 	if (!result)
 		std::cout << "LINK FAIL" << std::endl;
-	else
-		std::cout << "Link Shader OK." << std::endl;
 }
 
 void Shader::setBufferData(std::vector<glm::vec3> pos, std::vector<glm::vec3> color)

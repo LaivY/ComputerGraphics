@@ -14,6 +14,7 @@ void updateChrPosTimer(int unused);
 void updateChrHpTimer(int unused);
 void updateItemTimer(int unused);
 void updateObsTimer(int unused);
+void updateGenTimer(int unused);
 
 // INI FUNC
 void iniUniformData(GLuint pid);

@@ -62,4 +62,16 @@ public:
 		}
 		return false;
 	}
+
+	void clear()
+	{
+		data.clear();
+		set("Red", 0);
+		set("Blue", 0);
+		set("Green", 0);
+
+		set("chrSpeed", 0.05);
+
+		set("chrHpUpdateInterval", 1000);
+	}
 };
